@@ -265,7 +265,7 @@ bool Texture::Load(char* path)
 		buff = new byte[fileSize];
 		fread_s(buff, fileSize, fileSize, 1, fp);
 
-		image = (GLubyte*)tgaRead(buff, TGA_READER_ARGB);
+		image = (GLubyte*)tgaRead(buff, TGA_READER_RGBA);
 		nChannels = buff[16] / 8;
 
 		delete[] buff;
@@ -293,6 +293,11 @@ bool Texture::Load(char* path)
 				}
 			}
 			cvReleaseImage(&cvImage);
+		}
+		else
+		{
+			cout << "Texture Loader Error : failed to load image " << path << endl;
+			return false;
 		}
 	}
 

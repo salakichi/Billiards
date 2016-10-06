@@ -22,6 +22,9 @@ const TGA_ORDER *TGA_READER_ARGB = &_TGA_READER_ARGB;
 static const TGA_ORDER _TGA_READER_ABGR = { 0, 8, 16, 24 };
 const TGA_ORDER *TGA_READER_ABGR = &_TGA_READER_ABGR;
 
+static const TGA_ORDER _TGA_READER_RGBA = { 24, 16, 8, 0 };
+const TGA_ORDER *TGA_READER_RGBA = &_TGA_READER_RGBA;
+
 void *tgaMalloc(size_t size) {
 	return malloc(size);
 }

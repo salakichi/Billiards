@@ -27,6 +27,7 @@ typedef struct _TGA_ORDER {
 
 extern const TGA_ORDER *TGA_READER_ARGB;
 extern const TGA_ORDER *TGA_READER_ABGR;
+extern const TGA_ORDER *TGA_READER_RGBA;
 
 void *tgaMalloc(size_t size);
 void tgaFree(void *memory);
