@@ -10,6 +10,8 @@
 #include <list>
 #include <sys/stat.h>
 #include "MyGlew.h"
+#include "glm/vec2.hpp"
+#include "glm/vec3.hpp"
 #include "Texture.h"
 using namespace std;
 
@@ -24,38 +26,6 @@ class XFace;
 class XMesh;
 class XMaterial;
 class XModel;
-
-//
-// XVector2 struct
-//
-struct XVector2
-{
-	float x, y;
-	operator float* () { return (float*)&x; }
-	operator const float*() const { return (const float*)&x; }
-};
-
-//
-// XVector3 struct
-//
-struct XVector3
-{
-	float x, y, z;
-	operator float*() { return (float*)&x; }
-	operator const float*() const { return (const float*)&x; }
-	XVector3(float nx, float ny, float nz)
-	{
-		x = nx;
-		y = ny;
-		z = nz;
-	};
-	XVector3()
-	{
-		x = 0.f;
-		y = 0.f;
-		z = 0.f;
-	}
-};
 
 //
 // XColor struct
@@ -76,7 +46,7 @@ struct XColor
 //
 struct XBoundingSphere
 {
-	XVector3 center;
+	glm::vec3 center;
 	float radius;
 };
 
@@ -85,8 +55,8 @@ struct XBoundingSphere
 //
 struct XBoundingBox
 {
-	XVector3 min;
-	XVector3 max;
+	glm::vec3 min;
+	glm::vec3 max;
 };
 
 //
@@ -140,15 +110,15 @@ public:
 	int numNormals;
 	int numTexCoords;
 	int numFaces;
-	XVector3* vertex;
-	XVector3* normal;
-	XVector2* texcoord;
+	glm::vec3* vertex;
+	glm::vec3* normal;
+	glm::vec2* texcoord;
 	XFace* face;
 	XMesh &operator = (XMesh &ob);
 	XMesh();
-	int AddVertex(XVector3 &ob);
-	int AddNormal(XVector3 &ob);
-	int AddTexCoord(XVector2 &ob);
+	int AddVertex(glm::vec3 &ob);
+	int AddNormal(glm::vec3 &ob);
+	int AddTexCoord(glm::vec2 &ob);
 	int AddFace(XFace &ob);
 	void Release();
 	void SetName(char *str);
@@ -191,8 +161,8 @@ public:
 	MaterialList** matList;
 	GLuint* vbo;
 
-	XVector3 position;
-	XVector3 rotation;
+	glm::vec3 position;
+	glm::vec3 rotation;
 
 	bool Load(char *filename, float scale = 1.0f);
 	void Release();

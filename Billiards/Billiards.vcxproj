@@ -157,6 +157,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Ball.h" />
     <ClInclude Include="lodepng.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="MyFreeglut.h" />

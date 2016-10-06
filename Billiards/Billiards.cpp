@@ -87,14 +87,14 @@ void Initialize()
 		balls[i].model.Load(ballFilename);
 	}
 
-	balls[0].model.position = XVector3(0.f, 0.f, 0.f);
+	balls[0].model.position = glm::vec3(0.f, 0.f, 0.f);
 	float r = balls[0].model.sphere.radius*1.8f;
 	int k = 1;
 	for (int i = 0; i < 5; ++i)
 	{
 		for (int j = 0; j < 5 - i; ++j)
 		{
-			balls[k].model.position = XVector3(10.0f - j*r*sin(M_PI / 3), 0.f, j*r*cos(M_PI / 3) + (i-2)*r);
+			balls[k].model.position = glm::vec3(10.0f - j*r*sin(M_PI / 3), 0.f, j*r*cos(M_PI / 3) + (i-2)*r);
 			++k;
 		}
 	}

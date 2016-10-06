@@ -310,9 +310,9 @@ XMesh::XMesh()
 	numNormals = 0;
 	numTexCoords = 0;
 	numFaces = 0;
-	vertex = (XVector3*)malloc(1 * sizeof(XVector3));
-	normal = (XVector3*)malloc(1 * sizeof(XVector3));
-	texcoord = (XVector2*)malloc(1 * sizeof(XVector2));
+	vertex = (glm::vec3*)malloc(1 * sizeof(glm::vec3));
+	normal = (glm::vec3*)malloc(1 * sizeof(glm::vec3));
+	texcoord = (glm::vec2*)malloc(1 * sizeof(glm::vec2));
 	face = (XFace*)malloc(1 * sizeof(XFace));
 }
 
@@ -327,9 +327,9 @@ XMesh& XMesh::operator= (XMesh &ob)
 	numTexCoords = ob.numTexCoords;
 	numFaces = ob.numFaces;
 
-	vertex = (XVector3*)malloc(numVertices * sizeof(XVector3));
-	normal = (XVector3*)malloc(numNormals * sizeof(XVector3));
-	texcoord = (XVector2*)malloc(numTexCoords * sizeof(XVector2));
+	vertex = (glm::vec3*)malloc(numVertices * sizeof(glm::vec3));
+	normal = (glm::vec3*)malloc(numNormals * sizeof(glm::vec3));
+	texcoord = (glm::vec2*)malloc(numTexCoords * sizeof(glm::vec2));
 	face = (XFace*)malloc(numFaces * sizeof(XFace));
 
 	for (int i = 0; i<numVertices; i++)		vertex[i] = ob.vertex[i];
@@ -344,10 +344,10 @@ XMesh& XMesh::operator= (XMesh &ob)
 // Name : AddVertex()
 // Desc : 頂点を追加する
 //--------------------------------------------------------------------------------------------------
-int XMesh::AddVertex(XVector3 &ob)
+int XMesh::AddVertex(glm::vec3 &ob)
 {
 	numVertices++;
-	vertex = (XVector3*)realloc(vertex, numVertices * sizeof(XVector3));
+	vertex = (glm::vec3*)realloc(vertex, numVertices * sizeof(glm::vec3));
 	vertex[numVertices - 1] = ob;
 	return numVertices;
 }
@@ -356,10 +356,10 @@ int XMesh::AddVertex(XVector3 &ob)
 // Name : AddNormal()
 // Desc : 法線を追加する
 //--------------------------------------------------------------------------------------------------
-int XMesh::AddNormal(XVector3 &ob)
+int XMesh::AddNormal(glm::vec3 &ob)
 {
 	numNormals++;
-	normal = (XVector3*)realloc(normal, numNormals * sizeof(XVector3));
+	normal = (glm::vec3*)realloc(normal, numNormals * sizeof(glm::vec3));
 	normal[numNormals - 1] = ob;
 	return numNormals;
 }
@@ -368,10 +368,10 @@ int XMesh::AddNormal(XVector3 &ob)
 // Name : AddTexCoord()
 // Desc : テクスチャ座標を追加する
 //--------------------------------------------------------------------------------------------------
-int XMesh::AddTexCoord(XVector2 &ob)
+int XMesh::AddTexCoord(glm::vec2 &ob)
 {
 	numTexCoords++;
-	texcoord = (XVector2*)realloc(texcoord, numTexCoords * sizeof(XVector2));
+	texcoord = (glm::vec2*)realloc(texcoord, numTexCoords * sizeof(glm::vec2));
 	texcoord[numTexCoords - 1] = ob;
 	return numTexCoords;
 }
@@ -396,19 +396,19 @@ void XMesh::Release()
 {
 	if (vertex)
 	{
-		free((XVector3*)vertex);
+		free((glm::vec3*)vertex);
 		vertex = NULL;
 	}
 
 	if (normal)
 	{
-		free((XVector3*)normal);
+		free((glm::vec3*)normal);
 		normal = NULL;
 	}
 
 	if (texcoord)
 	{
-		free((XVector2*)texcoord);
+		free((glm::vec2*)texcoord);
 		texcoord = NULL;
 	}
 
@@ -446,9 +446,7 @@ XModel::XModel()
 	numMeshes = 0;
 	numMaterials = 0;
 	mesh = (XMesh*)malloc(1 * sizeof(XMesh));
-	position.x = 0.0f;
-	position.y = 0.0f;
-	position.z = 0.0f;
+	position = glm::vec3(0.f);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -542,7 +540,7 @@ void XModel::ComputeBoundingSphere()
 {
 	int count = 0;
 	float tempRadius = 0.0f;
-	XVector3 tempCenter;
+	glm::vec3 tempCenter;
 	tempCenter.x = 0.0f;
 	tempCenter.y = 0.0f;
 	tempCenter.z = 0.0f;
@@ -568,7 +566,7 @@ void XModel::ComputeBoundingSphere()
 		for (int j = 0; j<mesh[i].numVertices; j++)
 		{
 			float d = 0.0f;
-			XVector3 temp;
+			glm::vec3 temp;
 			temp.x = mesh[i].vertex[j].x - tempCenter.x;
 			temp.y = mesh[i].vertex[j].y - tempCenter.y;
 			temp.z = mesh[i].vertex[j].z - tempCenter.z;
@@ -588,7 +586,7 @@ void XModel::ComputeBoundingSphere()
 //--------------------------------------------------------------------------------------------------
 void XModel::ComputeBoundingBox()
 {
-	XVector3 tempMin, tempMax;
+	glm::vec3 tempMin, tempMax;
 
 	//　最初の頂点で初期化
 	tempMin = tempMax = mesh[0].vertex[0];
@@ -761,7 +759,7 @@ bool XModel::Load(char *filename, float scale)
 			for (int i = 0; i<vertCount; i++)
 			{
 				//　トークンから頂点データを取得
-				XVector3 tempVertex;
+				glm::vec3 tempVertex;
 				tempVertex.x = GetFloatToken();
 				tempVertex.y = GetFloatToken();
 				tempVertex.z = GetFloatToken();
@@ -854,7 +852,7 @@ bool XModel::Load(char *filename, float scale)
 			//　トークンから法線データを取得
 			for (int i = 0; i<normCount; i++)
 			{
-				XVector3 tempNormal;
+				glm::vec3 tempNormal;
 				tempNormal.x = GetFloatToken();
 				tempNormal.y = GetFloatToken();
 				tempNormal.z = GetFloatToken();
@@ -930,7 +928,7 @@ bool XModel::Load(char *filename, float scale)
 			for (int i = 0; i<uvCount; i++)
 			{
 				//　トークンからテクスチャ座標データを取得
-				XVector2 tempUV;
+				glm::vec2 tempUV;
 				tempUV.x = GetFloatToken();
 				tempUV.y = GetFloatToken();
 
