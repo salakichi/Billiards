@@ -5,4 +5,5 @@
 // https://sourceforge.net/projects/freeglut/files/freeglut/
 
 #define FREEGLUT_STATIC
+
 #include <GL/freeglut.h>

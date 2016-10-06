@@ -10,6 +10,14 @@
 #include <opencv2/opencv.hpp>
 
 #if _DEBUG
+	#pragma comment(lib, "IlmImfd.lib")
+	#pragma comment(lib, "ippicvmt.lib")
+	#pragma comment(lib, "libjasperd.lib")
+	#pragma comment(lib, "libjpegd.lib")
+	#pragma comment(lib, "libpngd.lib")
+	#pragma comment(lib, "libtiffd.lib")
+	#pragma comment(lib, "libwebpd.lib")
+	#pragma comment(lib, "zlibd.lib")
 	#pragma comment(lib, "opencv_calib3d310d.lib")
 	#pragma comment(lib, "opencv_core310d.lib")
 	#pragma comment(lib, "opencv_features2d310d.lib")
@@ -28,6 +36,14 @@
 	#pragma comment(lib, "opencv_videoio310d.lib")
 	#pragma comment(lib, "opencv_videostab310d.lib")
 #else
+	#pragma comment(lib, "IlmImf.lib")
+	#pragma comment(lib, "ippicvmt.lib")
+	#pragma comment(lib, "libjasper.lib")
+	#pragma comment(lib, "libjpeg.lib")
+	#pragma comment(lib, "libpng.lib")
+	#pragma comment(lib, "libtiff.lib")
+	#pragma comment(lib, "libwebp.lib")
+	#pragma comment(lib, "zlib.lib")
 	#pragma comment(lib, "opencv_calib3d310.lib")
 	#pragma comment(lib, "opencv_core310.lib")
 	#pragma comment(lib, "opencv_features2d310.lib")
