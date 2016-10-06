@@ -446,6 +446,9 @@ XModel::XModel()
 	numMeshes = 0;
 	numMaterials = 0;
 	mesh = (XMesh*)malloc(1 * sizeof(XMesh));
+	position.x = 0.0f;
+	position.y = 0.0f;
+	position.z = 0.0f;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1396,6 +1399,10 @@ bool XModel::Load(char *filename, float scale)
 //---------------------------------------------------------------------------------------------------
 void XModel::RenderMesh(int index)
 {
+	glPushMatrix();
+
+	glTranslatef(position.x, position.y, position.z);
+
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -1444,6 +1451,8 @@ void XModel::RenderMesh(int index)
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	glPopMatrix();
 }
 
 //---------------------------------------------------------------------------------------------------

@@ -1,13 +1,19 @@
 #include "stdafx.h"
 #include "XLoader.h"
 #include "Mouse.h"
+#include "Ball.h"
 
-int WindowWidth = 512;
-int WindowHeight = 512;
-XModel model;
+int WindowWidth = 1024;
+int WindowHeight = 1024;
+XModel tableModel;
+Ball balls[16];
 ViewCamera camera;
 
-const char* testModelPath = "data\\table.x";
+const char* tableModelPath = "data\\table.x";
+const char* ballModelPath = "data\\%d.x";
+const char* mainBallModelPath = "data\\white.x";
+
+#define M_PI 3.141592f
 
 char FpsString[50] = { 0 };
 double CurrentTime = 0.0;
@@ -71,7 +77,27 @@ void Initialize()
 	FrameCount = 0;
 
 	//　モデルファイルの読み込み
-	model.Load((char*)testModelPath);
+	tableModel.Load((char*)tableModelPath);
+	tableModel.position.y = -tableModel.box.max.y + 0.63f;
+
+	char ballFilename[256];
+	for (int i=0; i<=16; ++i)
+	{
+		sprintf_s(ballFilename, ballModelPath, i);
+		balls[i].model.Load(ballFilename);
+	}
+
+	balls[0].model.position = XVector3(0.f, 0.f, 0.f);
+	float r = balls[0].model.sphere.radius*1.8f;
+	int k = 1;
+	for (int i = 0; i < 5; ++i)
+	{
+		for (int j = 0; j < 5 - i; ++j)
+		{
+			balls[k].model.position = XVector3(10.0f - j*r*sin(M_PI / 3), 0.f, j*r*cos(M_PI / 3) + (i-2)*r);
+			++k;
+		}
+	}
 
 	//　バックバッファをクリアする色の指定
 	glClearColor(0.3f, 0.3f, 1.0f, 1.0f);
@@ -171,7 +197,11 @@ void Render2D()
 
 void Render3D()
 {
-	model.Render();
+	tableModel.Render();
+	for (int i = 0; i <= 16; ++i)
+	{
+		balls[i].model.Render();
+	}
 }
 
 void Display()
@@ -212,7 +242,11 @@ void Motion(int x, int y)
 
 void Shutdown()
 {
-	model.Release();
+	tableModel.Release();
+	for (int i = 0; i <= 16; ++i)
+	{
+		balls[i].model.Release();
+	}
 }
 
 void glutRenderText(void* bitmapfont, char*text)

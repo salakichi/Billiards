@@ -43,6 +43,18 @@ struct XVector3
 	float x, y, z;
 	operator float*() { return (float*)&x; }
 	operator const float*() const { return (const float*)&x; }
+	XVector3(float nx, float ny, float nz)
+	{
+		x = nx;
+		y = ny;
+		z = nz;
+	};
+	XVector3()
+	{
+		x = 0.f;
+		y = 0.f;
+		z = 0.f;
+	}
 };
 
 //
@@ -178,6 +190,9 @@ public:
 	MaterialStruct* matArr;
 	MaterialList** matList;
 	GLuint* vbo;
+
+	XVector3 position;
+	XVector3 rotation;
 
 	bool Load(char *filename, float scale = 1.0f);
 	void Release();
