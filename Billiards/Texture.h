@@ -1,6 +1,7 @@
 #pragma once
 
 #include"lodepng.h"
+#include"TgaReader.h"
 #include"MyFreeglut.h"
 #include"MyOpenCV.h"
 #include<Windows.h>

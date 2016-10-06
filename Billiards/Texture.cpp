@@ -244,9 +244,17 @@ bool Texture::Load(char* path)
 	else if (strcmp(fileEx, "tga") == 0)
 	{
 		FILE *fp;
-		byte header[18];
-		int imageSize;
-		int type1, type2;
+		int fileSize;
+		byte *buff;
+
+		struct _stat buf;
+		int result = _stat(filepath, &buf);
+		if (result != 0)
+		{
+			cout << "Texture Loader Error : file " << path << " not exists" << endl;
+			return false;
+		}
+		fileSize = buf.st_size;
 
 		if (fopen_s(&fp, path, "rb"))
 		{
@@ -254,107 +262,11 @@ bool Texture::Load(char* path)
 			return false;
 		}
 
-		fread_s(header, 18, 18, 1, fp);
+		buff = new byte[fileSize];
+		fread_s(buff, fileSize, fileSize, 1, fp);
 
-		if (header[2] != 2)
-		{
-			cout << "Texture Loader Error : LoadTga() type " << (int)header[2] << " TGA file is unsupported" << endl;
-			cout << "Filename : " << path << endl;
-			fclose(fp);
-			return false;
-		}
-
-		width = header[13] * 256 + header[12];
-		height = header[15] * 256 + header[14];
-		nChannels = header[16] / 8;
-		type1 = header[17] & 0x10;
-		type2 = header[17] & 0x20;
-		imageSize = width * height * nChannels;
-
-		image = new byte[imageSize];
-		byte* buff = new byte[imageSize];
-		fread_s(buff, imageSize, imageSize, 1, fp);
-		fclose(fp);
-
-		if (type1 == 0 && type2 == 0)
-			if (nChannels == 3)
-			{
-				for (int j = 0; j<height; j++)
-					for (int i = 0; i<width; i++)
-					{
-						image[(j*width + i) * 3] = buff[(height - j - 1)*width * 3 + i * 3 + 2];
-						image[(j*width + i) * 3 + 1] = buff[(height - j - 1)*width * 3 + i * 3 + 1];
-						image[(j*width + i) * 3 + 2] = buff[(height - j - 1)*width * 3 + i * 3];
-					}
-			}
-			else if (nChannels == 4)
-			{
-				for (int j = 0; j<height; j++)
-					for (int i = 0; i<width; i++)
-					{
-						image[(j*width + i) * 4] = buff[(height - j - 1)*width * 4 + i * 4 + 2];
-						image[(j*width + i) * 4 + 1] = buff[(height - j - 1)*width * 4 + i * 4 + 1];
-						image[(j*width + i) * 4 + 2] = buff[(height - j - 1)*width * 4 + i * 4];
-						image[(j*width + i) * 4 + 3] = buff[(height - j - 1)*width * 4 + i * 4 + 3];
-					}
-			}
-
-		if (type1 == 0 && type2 == 1)
-			if (nChannels == 3)
-				for (int j = 0; j<height; j++)
-					for (int i = 0; i<width; i++)
-					{
-						image[(j*width + i) * 3] = buff[(j*width + i) * 3 + 2];
-						image[(j*width + i) * 3 + 1] = buff[(j*width + i) * 3 + 1];
-						image[(j*width + i) * 3 + 2] = buff[(j*width + i) * 3];
-					}
-			else if (nChannels == 4)
-				for (int j = 0; j<height; j++)
-					for (int i = 0; i<width; i++)
-					{
-						image[(j*width + i) * 4] = buff[(j*width + i) * 4 + 2];
-						image[(j*width + i) * 4 + 1] = buff[(j*width + i) * 4 + 1];
-						image[(j*width + i) * 4 + 2] = buff[(j*width + i) * 4];
-						image[(j*width + i) * 4 + 3] = buff[(j*width + i) * 4 + 3];
-					}
-
-		if (type1 == 1 && type2 == 0)
-			if (nChannels == 3)
-				for (int j = 0; j<height; j++)
-					for (int i = 0; i<width; i++)
-					{
-						image[(j*width + i) * 3] = buff[(height - j - 1)*width * 3 + i * 3];
-						image[(j*width + i) * 3 + 1] = buff[(height - j - 1)*width * 3 + i * 3 + 1];
-						image[(j*width + i) * 3 + 2] = buff[(height - j - 1)*width * 3 + i * 3 + 2];
-					}
-			else if (nChannels == 4)
-				for (int j = 0; j<height; j++)
-					for (int i = 0; i<width; i++)
-					{
-						image[(j*width + i) * 4] = buff[(height - j - 1)*width * 4 + i * 4 + 1];
-						image[(j*width + i) * 4 + 1] = buff[(height - j - 1)*width * 4 + i * 4 + 2];
-						image[(j*width + i) * 4 + 2] = buff[(height - j - 1)*width * 4 + i * 4 + 3];
-						image[(j*width + i) * 4 + 3] = buff[(height - j - 1)*width * 4 + i * 4];
-					}
-
-		if (type1 == 1 && type2 == 1)
-			if (nChannels == 3)
-				for (int j = 0; j<height; j++)
-					for (int i = 0; i<width; i++)
-					{
-						image[(j*width + i) * 3] = buff[(j*width + i) * 3];
-						image[(j*width + i) * 3 + 1] = buff[(j*width + i) * 3 + 1];
-						image[(j*width + i) * 3 + 2] = buff[(j*width + i) * 3 + 2];
-					}
-			else if (nChannels == 4)
-				for (int j = 0; j<height; j++)
-					for (int i = 0; i<width; i++)
-					{
-						image[(j*width + i) * 4] = buff[(j*width + i) * 4 + 1];
-						image[(j*width + i) * 4 + 1] = buff[(j*width + i) * 4 + 2];
-						image[(j*width + i) * 4 + 2] = buff[(j*width + i) * 4 + 3];
-						image[(j*width + i) * 4 + 3] = buff[(j*width + i) * 4];
-					}
+		image = (GLubyte*)tgaRead(buff, TGA_READER_ARGB);
+		nChannels = buff[16] / 8;
 
 		delete[] buff;
 	}
