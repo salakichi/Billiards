@@ -170,6 +170,7 @@
     <ClInclude Include="XLoader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Billiards.cpp" />
     <ClCompile Include="lodepng.cpp" />
     <ClCompile Include="Mouse.cpp" />

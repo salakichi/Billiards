@@ -12,7 +12,11 @@
 #include "MyGlew.h"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "Texture.h"
+#include "Mouse.h"
 using namespace std;
 
 #define BUFFER_OFFSET(bytes) ((GLubyte *)NULL + (bytes))
@@ -148,29 +152,36 @@ class XModel
 private:
 	void ComputeBoundingSphere();
 	void ComputeBoundingBox();
-
-public:
 	int numMeshes;
 	int numMaterials;
 	XMesh *mesh;
 	list<XMaterial> material;
-	XBoundingSphere sphere;
-	XBoundingBox box;
 
 	MaterialStruct* matArr;
 	MaterialList** matList;
 	GLuint* vbo;
 
+	int AddMesh(XMesh ob);
+	int AddMaterial(XMaterial ob);
+	void ChangeMaterialIndex(XMaterial ob, int index);
+	void DeleteMaterial(XMaterial ob);
+
+	bool rotationFlag;
+
+public:
+	XBoundingSphere sphere;
+	XBoundingBox box;
+
 	glm::vec3 position;
-	glm::vec3 rotation;
+	glm::mat4 rotation;
 
 	bool Load(char *filename, float scale = 1.0f);
 	void Release();
 	void RenderMesh(int index);
 	void Render();
-	int AddMesh(XMesh ob);
-	int AddMaterial(XMaterial ob);
-	void ChangeMaterialIndex(XMaterial ob, int index);
-	void DeleteMaterial(XMaterial ob);
+	void EnableRotate()
+	{
+		rotationFlag = true;
+	}
 	XModel();
 };

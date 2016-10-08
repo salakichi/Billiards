@@ -16,15 +16,16 @@ Author : Pocol
 #include <iostream>
 #include <cmath>
 #include "MyFreeglut.h"
+#include "glm/vec3.hpp"
 using namespace std;
 
 
 //
 //Å@global
 //
-const double PI = 3.14159265358979323846264338327;
-template<class T> static inline T RadToDeg(T rad) { return ((rad)*(180.0 / PI)); }
-template<class T> static inline T DegToRad(T deg) { return ((deg)*(PI / 180.0)); }
+const float PI = 3.1415926535f;
+template<class T> static inline T RadToDeg(T rad) { return ((rad)*(180.f / PI)); }
+template<class T> static inline T DegToRad(T deg) { return ((deg)*(PI / 180.f)); }
 typedef enum MState { Push, Release, None };
 
 //////////////////////////////////////////////////////////////////////////
@@ -33,12 +34,12 @@ typedef enum MState { Push, Release, None };
 class MPosition
 {
 public:
-	double x;
-	double y;
+	float x;
+	float y;
 
-	MPosition(double nx = 0.0, double ny = 0.0) { x = nx; y = ny; }
+	MPosition(float nx = 0.f, float ny = 0.f) { x = nx; y = ny; }
 	~MPosition() {}
-	void Reset() { x = 0.0, y = 0.0; }
+	void Reset() { x = 0.f, y = 0.f; }
 	void ConsoleOut() { cout << "(x, y) = (" << x << ", " << y << ")\n"; }
 };
 
@@ -70,14 +71,14 @@ public:
 	MouseButton left;
 	MouseButton middle;
 
-	double distance;
-	double angle[3];
-	double position[3];
-	double target[3];
-	double upvector[3];
-	double translate[3];
+	float distance;
+	glm::vec3 angle;
+	glm::vec3 position;
+	glm::vec3 target;
+	glm::vec3 upvector;
+	glm::vec3 translate;
 
-	ViewCamera(double dist = 5.0);
+	ViewCamera(float dist = 45.0);
 	~ViewCamera();
 	void Reset();
 	void MouseInput(int button, int state, int x, int y);

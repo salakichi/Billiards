@@ -3,8 +3,8 @@
 #include "Mouse.h"
 #include "Ball.h"
 
-int WindowWidth = 1024;
-int WindowHeight = 1024;
+int WindowWidth = 800;
+int WindowHeight = 800;
 XModel tableModel;
 Ball balls[16];
 ViewCamera camera;
@@ -30,6 +30,7 @@ void Idle();
 void Reshape(int x, int y);
 void Mouse(int button, int state, int x, int y);
 void Motion(int x, int y);
+void Keyboard(unsigned char key, int x, int y);
 void Render3D();
 void glutRenderText(void* bitmapfont, char* text);
 
@@ -51,6 +52,7 @@ int main(int argc, char **argv)
 	glutIdleFunc(Idle);
 	glutMouseFunc(Mouse);
 	glutMotionFunc(Motion);
+	glutKeyboardFunc(Keyboard);
 
 	Initialize();
 
@@ -78,23 +80,29 @@ void Initialize()
 
 	//　モデルファイルの読み込み
 	tableModel.Load((char*)tableModelPath);
-	tableModel.position.y = -tableModel.box.max.y + 0.63f;
+	tableModel.position.y = -tableModel.box.max.y + 0.3f;
+
+	float padding = 2.4f;
+	glm::vec3 wallMin = glm::vec3(-tableModel.box.max.x + padding, 0.f, -tableModel.box.max.z + padding);
+	glm::vec3 wallMax = glm::vec3(tableModel.box.max.x - padding, 0.f, tableModel.box.max.z - padding);
 
 	char ballFilename[256];
 	for (int i=0; i<=16; ++i)
 	{
 		sprintf_s(ballFilename, ballModelPath, i);
 		balls[i].model.Load(ballFilename);
+		balls[i].SetWall(wallMin, wallMax);
+		balls[i].model.EnableRotate();
 	}
 
 	balls[0].model.position = glm::vec3(0.f, 0.f, 0.f);
-	float r = balls[0].model.sphere.radius*1.8f;
+	float r = balls[0].model.sphere.radius*2.f;
 	int k = 1;
 	for (int i = 0; i < 5; ++i)
 	{
 		for (int j = 0; j < 5 - i; ++j)
 		{
-			balls[k].model.position = glm::vec3(10.0f - j*r*sin(M_PI / 3), 0.f, j*r*cos(M_PI / 3) + (i-2)*r);
+			balls[k].model.position = glm::vec3(9.0f - j*r*sin(M_PI / 3), 0.f, j*r*cos(M_PI / 3) + (i-2)*r);
 			++k;
 		}
 	}
@@ -206,6 +214,22 @@ void Render3D()
 
 void Display()
 {
+	for (int i = 0; i < 16; ++i)
+	{
+		balls[i].Move();
+		balls[i].TestCollisionWall();
+		for (int j = 0; j < 16; ++j)
+		{
+			if (i != j)
+			{
+				balls[i].TestCollisionBall(balls[j]);
+			}
+		}
+		balls[i].TestPocket();
+		balls[i].UpdateVelocity();
+	}
+
+
 	//　バックバッファをクリア
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -238,6 +262,25 @@ void Mouse(int button, int state, int x, int y)
 void Motion(int x, int y)
 {
 	camera.MouseMotion(x, y);
+}
+
+bool onEnter = false;
+void Keyboard(unsigned char key, int x, int y)
+{
+	switch ((int)key)
+	{
+	case 13:	// Enter
+		if (!onEnter)
+		{
+			balls[0].AddVec(glm::vec3(0.25f, 0.f, 0.f));
+			onEnter = true;
+		}
+		break;
+	default:
+		cout << (int)key << endl;
+		onEnter = false;
+		break;
+	}
 }
 
 void Shutdown()
