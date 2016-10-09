@@ -86,7 +86,8 @@ bool Texture::Load(char* path)
 	}
 
 	// pngå`éÆÇÃèÍçá
-	if (!strcmp(fileEx, "png") || fileType == 1)
+	//if (!strcmp(fileEx, "png") || fileType == 1)
+	if (fileType == 1)
 	{
 		vector<unsigned char> img; //the raw pixels
 		unsigned w, h;
@@ -114,7 +115,8 @@ bool Texture::Load(char* path)
 		img.clear();
 	}
 	// bmpå`éÆÇÃèÍçá
-	else if (!strcmp(fileEx, "bmp") || fileType == 2)
+	//else if (!strcmp(fileEx, "bmp") || fileType == 2)
+	else if (fileType == 2)
 	{
 		FILE *fp;
 		BITMAPFILEHEADER fileHeader;

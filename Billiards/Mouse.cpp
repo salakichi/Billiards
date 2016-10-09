@@ -82,7 +82,7 @@ void MouseButton::ConsoleOut()
 //　　ViewCamera
 //　　Desc : コンストラクタ
 //-------------------------------------------------------------------------------------------------------
-ViewCamera::ViewCamera(float dist)
+ViewCamera::ViewCamera(double dist)
 {
 	distance = dist;
 	Reset();
@@ -106,8 +106,8 @@ void ViewCamera::MouseMotion(int x, int y)
 	if (left.state == Push)
 	{
 		//　移動量を計算
-		left.current.x = (float)x - left.before.x + left.after.x;
-		left.current.y = (float)y - left.before.y + left.after.y;
+		left.current.x = (double)x - left.before.x + left.after.x;
+		left.current.y = (double)y - left.before.y + left.after.y;
 
 		if (left.current.y >= 360.0) left.current.y -= 360.0;
 		else if (left.current.y < 0.0) left.current.y += 360.0;
@@ -119,16 +119,16 @@ void ViewCamera::MouseMotion(int x, int y)
 	//　右ボタンの処理
 	if (right.state == Push)
 	{
-		right.current.x = (float)x - right.before.x + right.after.x;
-		right.current.y = -(float)y - right.before.y + right.after.y;
+		right.current.x = (double)x - right.before.x + right.after.x;
+		right.current.y = -(double)y - right.before.y + right.after.y;
 	}
 
 	//　中ボタンの処理
 	if (middle.state == Push)
 	{
 		//　移動量を計算
-		middle.current.x = (float)x - middle.before.x + middle.after.x;
-		middle.current.y = (float)y - middle.before.y + middle.after.y;
+		middle.current.x = (double)x - middle.before.x + middle.after.x;
+		middle.current.y = (double)y - middle.before.y + middle.after.y;
 		translate[0] = middle.current.x * 0.005;
 		translate[1] = -middle.current.y * 0.005;
 	}
@@ -147,8 +147,8 @@ void ViewCamera::MouseInput(int button, int state, int x, int y)
 	case GLUT_LEFT_BUTTON:
 		if (state == GLUT_DOWN)
 		{
-			left.before.x = (float)x;
-			left.before.y = (float)y;
+			left.before.x = (double)x;
+			left.before.y = (double)y;
 			left.state = Push;
 		}
 		else if (state == GLUT_UP)
@@ -163,8 +163,8 @@ void ViewCamera::MouseInput(int button, int state, int x, int y)
 	case GLUT_RIGHT_BUTTON:
 		if (state == GLUT_DOWN)
 		{
-			right.before.x = (float)x;
-			right.before.y = -(float)y;
+			right.before.x = (double)x;
+			right.before.y = -(double)y;
 			right.state = Push;
 		}
 		else if (state == GLUT_UP)
@@ -179,8 +179,8 @@ void ViewCamera::MouseInput(int button, int state, int x, int y)
 	case GLUT_MIDDLE_BUTTON:
 		if (state == GLUT_DOWN)
 		{
-			middle.before.x = (float)x;
-			middle.before.y = (float)y;
+			middle.before.x = (double)x;
+			middle.before.y = (double)y;
 			middle.state = Push;
 		}
 		else if (state == GLUT_UP)
@@ -206,7 +206,7 @@ void ViewCamera::Reset()
 	middle.Reset();
 
 	angle[0] = DegToRad(0.0);
-	angle[1] = DegToRad(90.0);
+	angle[1] = DegToRad(45.0);
 	angle[2] = 0.0;
 	position[0] = 0.0;
 	position[1] = 0.0;
@@ -244,7 +244,7 @@ void drawDisk()
 //------------------------------------------------------------------------------------------------------
 void ViewCamera::Set()
 {
-	float zoom = distance;
+	double zoom = distance;
 	zoom += right.current.y / 30.0;
 
 	//　視点位置を決定
@@ -273,8 +273,8 @@ void ViewCamera::Set()
 //------------------------------------------------------------------------------------------------------
 void ViewCamera::RenderSubAxis(int w, int h)
 {
-	const float zoom = 15.f;
-	glm::vec3 eye = glm::vec3(0.f);
+	const double zoom = 15.0;
+	double eye[3] = { 0.0, 0.0, 0.0 };
 
 	//　ウィンドウ全体をビューポートにする
 	glViewport(w - 100, h - 100, 100, 100);
