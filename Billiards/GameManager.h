@@ -3,11 +3,12 @@
 #include "XLoader.h"
 #include "Mouse.h"
 #include "Ball.h"
+#include "Font.h"
 #include <process.h>
 #include <mmsystem.h>
 
-#define WINDOW_DEFAULT_W 600
-#define WINDOW_DEFAULT_H 600
+#define WINDOW_DEFAULT_W 800
+#define WINDOW_DEFAULT_H 800
 #define WINDOW_DEFAULT_POS_X 0
 #define WINDOW_DEFAULT_POS_Y 0
 #define M_PI 3.1415926535f
@@ -56,6 +57,9 @@ private:
 
 	// シャドウ用
 	GLuint shadowTexture;
+
+	// フォント
+	Font font;
 
 	HANDLE thread;
 	HANDLE mutex;

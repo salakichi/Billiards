@@ -4,6 +4,10 @@
 const char* tableModelPath = "data\\table.x";
 const char* ballModelPath = "data\\%d.x";
 const char* skyboxModelPath = "data\\room\\松野家居間_ダンス用.x";
+const char* misakiFontPath = "data\\font\\misaki_gothic.ttf";
+const char* bokuFontPath = "data\\font\\bokutachi.otf";
+#define MISAKI_FONT "美咲フォント"
+#define BOKU_FONT "ぼくたちのゴシック"
 
 static const GLfloat lightpos[] = { 0.0f, 5.0f, 0.0f, 1.f }; /* 位置　　　　　　　 */
 static const GLfloat lightcol[] = { 1.0f, 1.0f, 1.0f, 1.f }; /* 直接光強度　　　　 */
@@ -18,10 +22,13 @@ static const GLfloat lightamb[] = { 0.1f, 0.1f, 0.1f, 1.f }; /* 環境光強度　　　
 glm::uvec2 windowPos;
 glm::uvec2 windowSize;
 bool loadFinishFlag = false;
+char FpsString[50] = { 0 };
 
 void glutRenderText(void* bitmapfont, char*text);
 void DrawSmallCircle(float radius, int x, int y);		// 半径32.0まで 品質：良
 void DrawLargeCircle(float radius, int x, int y);		// 半径制限なし 品質：悪
+int drawText(char *text, HFONT hfont, glm::uvec2 pos, glm::vec2 move);
+int drawText(char *text, HFONT hfont, glm::uvec2 pos, glm::vec2 move, glm::vec4 mainColor, glm::vec4 edgeColor, int edgeSize);
 
 GameManager::GameManager()
 {
@@ -260,6 +267,13 @@ bool GameManager::LoadMaterial()
 			if (!loadResult) throw ballFilename;
 		}
 
+		// フォントファイルの読み込み
+		loadResult = font.Load(misakiFontPath, MISAKI_FONT, 32);
+		if (!loadResult) throw misakiFontPath;
+
+		loadResult = font.Load(bokuFontPath, BOKU_FONT, 32);
+		if (!loadResult) throw bokuFontPath;
+
 		// ローディング終了
 		CloseLoadScreen();
 
@@ -313,8 +327,6 @@ void GameManager::InitializeModel()
 
 void GameManager::Render2D()
 {
-	char FpsString[128];
-
 	//　時間計測とFPS算出
 	CurrentCount = glutGet(GLUT_ELAPSED_TIME);
 	CurrentTime = (CurrentCount - LastCount) / 1000.0;
@@ -328,11 +340,7 @@ void GameManager::Render2D()
 	}
 
 	//　文字の描画
-	glColor4f(1.0, 1.0, 1.0, 1.0);
-	glRasterPos2i(15, 15);
-	glutRenderText(GLUT_BITMAP_HELVETICA_12, FpsString);
-
-	DrawLargeCircle(50.0f, 100.f, 100.f);
+	drawText(FpsString, font.list[BOKU_FONT], glm::vec2(20,40), glm::vec2());
 
 #ifdef SHADOW_MAP_ON
 	glActiveTexture(GL_TEXTURE1);
@@ -363,9 +371,16 @@ void GameManager::Render3D()
 	skyboxModel.Render();
 }
 
+int glProperties[] = { GL_LIGHTING, GL_CULL_FACE };
 void GameManager::RenderWithoutShadow()
 {
-	bool isLighting = false;
+	// 2D <=> 3D 時にON/OFFするプロパティ用のフラグをOFFに
+	map<int, bool> propertyFlag;
+	int propertyNum = sizeof(glProperties) / sizeof(glProperties[0]);
+	for (int i = 0; i<propertyNum; ++i)
+	{
+		propertyFlag.insert(map<int, bool>::value_type(glProperties[i], false));
+	}
 
 	//　バックバッファをクリア
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -394,20 +409,25 @@ void GameManager::RenderWithoutShadow()
 	glPushMatrix();
 	glLoadIdentity();
 
-	if (glIsEnabled(GL_LIGHTING))
-	{
-		isLighting = true;
-		glDisable(GL_LIGHTING);
+	// enable の プロパティを disable に
+	for (map<int, bool>::iterator it = propertyFlag.begin(); it != propertyFlag.end(); it++) {
+		if (glIsEnabled(it->first))
+		{
+			it->second = true;
+			glDisable(it->first);
+		}
 	}
 
 	//　2Dシーンの描画
 	Render2D();
 
-	if (!glIsEnabled(GL_LIGHTING))
-	{
-		if (isLighting)
-			glEnable(GL_LIGHTING);
-	}
+	// disable にしたプロパティを enable に
+	for_each(propertyFlag.begin(), propertyFlag.end(), [](pair<int, bool> elm) {
+		if (!glIsEnabled(elm.first))
+		{
+			if (elm.second) glEnable(elm.first);
+		}
+	});
 
 	//　2D　→　3D
 	glPopMatrix();
@@ -651,7 +671,6 @@ uint GameManager::GetWindowHeight() { return windowSize.y; }
 uint GameManager::GetWindowPosX() { return windowPos.x; }
 uint GameManager::GetWindowPosY() { return windowPos.y; }
 
-
 void GameManager::SetWindowSize(int x, int y)
 {
 	//　ウィンドウサイズを保存
@@ -709,4 +728,85 @@ void glutRenderText(void* bitmapfont, char*text)
 {
 	for (int i = 0; i<(int)strlen(text); i++)
 		glutBitmapCharacter(bitmapfont, (int)text[i]);
+}
+
+int drawText(char *text, HFONT hfont, glm::uvec2 pos, glm::vec2 move)
+{
+	unsigned int textLength;	//引数で受け取ったテキストの長さ
+	WCHAR * unicodeText;		//textをUNICODEに変換した文字列を格納する
+	GLuint listbaseIdx;		//ディスプレイリストの最初のインデックス
+
+	glRasterPos2i(pos.x, pos.y);
+
+	//日本語の文字列として扱うよう設定
+	setlocale(LC_CTYPE, "jpn");
+
+	//textの文字数を取得
+	textLength = (unsigned int)_mbstrlen(text);
+	if (textLength == -1)
+		return -1;
+
+	//textの文字数分のワイド文字列の領域を作成
+	unicodeText = new WCHAR[textLength + 1];
+	if (unicodeText == NULL)
+	{
+		return -2;
+	}
+
+	//取得したジョイントIDをUNICODEに変換する
+	if (MultiByteToWideChar(CP_ACP, 0, text, -1, unicodeText, (sizeof(WCHAR) * textLength) + 1) == 0)
+		return -3;
+
+	HDC hdc = wglGetCurrentDC();
+	SelectObject(hdc, hfont);
+
+	//文字数分のディスプレイリストを確保し、ディスプレイリストの最初のインデックスを取得
+	listbaseIdx = glGenLists(textLength);
+
+	GLYPHMETRICSFLOAT agmf;
+	for (unsigned int textCnt = 0; textCnt < textLength; ++textCnt)
+	{
+		if (wglUseFontBitmapsW(hdc, unicodeText[textCnt], 1, listbaseIdx + textCnt) == FALSE)
+		//if (wglUseFontOutlines(hdc, unicodeText[textCnt], 1, listbaseIdx + textCnt, 0.f, 1.f, WGL_FONT_POLYGONS, &agmf) == FALSE)
+		{
+			//MessageBox(hwnd, "wglUseFontBitmaps() Error!!", "wgl Error", MB_OK);
+		}
+	}
+
+	//1文字描画したら文字を何bitずらすか
+	glBitmap(0, 0, 0, 0, move.x, move.y, NULL);
+
+	//ディスプレイリストを実行する
+	for (unsigned int textCnt = 0; textCnt < textLength; textCnt++)
+	{
+		glCallList(listbaseIdx + (GLuint)textCnt);
+	}
+
+	delete[] unicodeText;
+	glDeleteLists(listbaseIdx, textLength);
+
+	return 1;
+}
+
+// 縁つき
+int drawText(char *text, HFONT hfont, glm::uvec2 pos, glm::vec2 move, glm::vec4 mainColor, glm::vec4 edgeColor, int edgeSize)
+{
+	// 文字列描画
+	glColor4f(mainColor.r, mainColor.g, mainColor.b, mainColor.a);
+	drawText(text, hfont, move, pos);
+
+	// 縁取り
+	if (edgeSize > 0)
+	{
+		glColor4f(edgeColor.r, edgeColor.g, edgeColor.b, edgeColor.a);
+		for (int i = -edgeSize + 1; i<edgeSize; i++)
+		{
+			drawText(text, hfont, move, glm::vec2(pos.x + i, pos.y + (edgeSize - i)));
+			drawText(text, hfont, move, glm::vec2(pos.x + i, pos.y - (edgeSize - i)));
+		}
+		drawText(text, hfont, move, glm::vec2(pos.x + edgeSize, pos.y));
+		drawText(text, hfont, move, glm::vec2(pos.x - edgeSize, pos.y));
+	}
+
+	return 1;
 }
