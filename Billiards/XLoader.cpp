@@ -1401,6 +1401,9 @@ bool XModel::Load(char *filename, float scale)
 //---------------------------------------------------------------------------------------------------
 void XModel::RenderMesh(int index)
 {
+	if (vbo == NULL || vbo[index * 4 + 0] <= 0 || vbo[index * 4 + 1] <= 0 || vbo[index * 4 + 2] <= 0 || vbo[index * 4 + 3] <= 0)
+		return;
+
 	glPushMatrix();
 	
 	if (rotationFlag)
