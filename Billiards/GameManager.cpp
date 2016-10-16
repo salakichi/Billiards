@@ -27,8 +27,8 @@ char FpsString[50] = { 0 };
 void glutRenderText(void* bitmapfont, char*text);
 void DrawSmallCircle(float radius, int x, int y);		// 半径32.0まで 品質：良
 void DrawLargeCircle(float radius, int x, int y);		// 半径制限なし 品質：悪
-int drawText(char *text, HFONT hfont, glm::uvec2 pos, glm::vec2 move);
-int drawText(char *text, HFONT hfont, glm::uvec2 pos, glm::vec2 move, glm::vec4 mainColor, glm::vec4 edgeColor, int edgeSize);
+int drawText(char *text, FTPixmapFont* hfont, glm::uvec2 pos, glm::vec2 move);
+int drawText(char *text, FTPixmapFont* hfont, glm::uvec2 pos, glm::vec2 move, glm::vec4 mainColor, glm::vec4 edgeColor, int edgeSize);
 
 GameManager::GameManager()
 {
@@ -730,11 +730,10 @@ void glutRenderText(void* bitmapfont, char*text)
 		glutBitmapCharacter(bitmapfont, (int)text[i]);
 }
 
-int drawText(char *text, HFONT hfont, glm::uvec2 pos, glm::vec2 move)
+int drawText(char *text, FTPixmapFont* font, glm::uvec2 pos, glm::vec2 move)
 {
 	unsigned int textLength;	//引数で受け取ったテキストの長さ
 	WCHAR * unicodeText;		//textをUNICODEに変換した文字列を格納する
-	GLuint listbaseIdx;		//ディスプレイリストの最初のインデックス
 
 	glRasterPos2i(pos.x, pos.y);
 
@@ -757,43 +756,20 @@ int drawText(char *text, HFONT hfont, glm::uvec2 pos, glm::vec2 move)
 	if (MultiByteToWideChar(CP_ACP, 0, text, -1, unicodeText, (sizeof(WCHAR) * textLength) + 1) == 0)
 		return -3;
 
-	HDC hdc = wglGetCurrentDC();
-	SelectObject(hdc, hfont);
-
-	//文字数分のディスプレイリストを確保し、ディスプレイリストの最初のインデックスを取得
-	listbaseIdx = glGenLists(textLength);
-
-	GLYPHMETRICSFLOAT agmf;
-	for (unsigned int textCnt = 0; textCnt < textLength; ++textCnt)
-	{
-		if (wglUseFontBitmapsW(hdc, unicodeText[textCnt], 1, listbaseIdx + textCnt) == FALSE)
-		//if (wglUseFontOutlines(hdc, unicodeText[textCnt], 1, listbaseIdx + textCnt, 0.f, 1.f, WGL_FONT_POLYGONS, &agmf) == FALSE)
-		{
-			//MessageBox(hwnd, "wglUseFontBitmaps() Error!!", "wgl Error", MB_OK);
-		}
-	}
-
-	//1文字描画したら文字を何bitずらすか
-	glBitmap(0, 0, 0, 0, move.x, move.y, NULL);
-
-	//ディスプレイリストを実行する
-	for (unsigned int textCnt = 0; textCnt < textLength; textCnt++)
-	{
-		glCallList(listbaseIdx + (GLuint)textCnt);
-	}
+	// 表示
+	font->Render(unicodeText);
 
 	delete[] unicodeText;
-	glDeleteLists(listbaseIdx, textLength);
 
 	return 1;
 }
 
 // 縁つき
-int drawText(char *text, HFONT hfont, glm::uvec2 pos, glm::vec2 move, glm::vec4 mainColor, glm::vec4 edgeColor, int edgeSize)
+int drawText(char *text, FTPixmapFont* font, glm::uvec2 pos, glm::vec2 move, glm::vec4 mainColor, glm::vec4 edgeColor, int edgeSize)
 {
 	// 文字列描画
 	glColor4f(mainColor.r, mainColor.g, mainColor.b, mainColor.a);
-	drawText(text, hfont, move, pos);
+	drawText(text, font, move, pos);
 
 	// 縁取り
 	if (edgeSize > 0)
@@ -801,11 +777,11 @@ int drawText(char *text, HFONT hfont, glm::uvec2 pos, glm::vec2 move, glm::vec4 
 		glColor4f(edgeColor.r, edgeColor.g, edgeColor.b, edgeColor.a);
 		for (int i = -edgeSize + 1; i<edgeSize; i++)
 		{
-			drawText(text, hfont, move, glm::vec2(pos.x + i, pos.y + (edgeSize - i)));
-			drawText(text, hfont, move, glm::vec2(pos.x + i, pos.y - (edgeSize - i)));
+			drawText(text, font, move, glm::vec2(pos.x + i, pos.y + (edgeSize - i)));
+			drawText(text, font, move, glm::vec2(pos.x + i, pos.y - (edgeSize - i)));
 		}
-		drawText(text, hfont, move, glm::vec2(pos.x + edgeSize, pos.y));
-		drawText(text, hfont, move, glm::vec2(pos.x - edgeSize, pos.y));
+		drawText(text, font, move, glm::vec2(pos.x + edgeSize, pos.y));
+		drawText(text, font, move, glm::vec2(pos.x - edgeSize, pos.y));
 	}
 
 	return 1;

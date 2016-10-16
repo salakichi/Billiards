@@ -3,7 +3,7 @@
 
 void Font::ErrorLog(char* msg)
 {
-	cout << "GameManager Error : " << msg << endl;
+	cout << "Font Error : " << msg << endl;
 }
 
 bool Font::isLoaded(const char* fileName)
@@ -21,29 +21,36 @@ bool Font::isLoaded(const char* fileName)
 
 bool Font::Load(const char* fileName, const char* fontName, int fontSize)
 {
-	if (!isLoaded(fileName)) {
-		if (AddFontResourceEx(fileName, FR_PRIVATE, NULL) <= 0)
+	
+	if (!isLoaded(fileName))
+	{
+		FTPixmapFont* newFont = new FTPixmapFont(fileName);
+		if (newFont->Error())
 		{
-			cout << "Font Error : Init() failed to read font\\bokutachi.otf" << endl;
+			delete newFont;
+			ErrorLog("failed to load font file");
 			return false;
 		}
+		else
+		{
+			newFont->FaceSize(fontSize);
+			fileList.push_back(fileName);
+			list.insert(map<string, FTPixmapFont*>::value_type(fontName, newFont));
+		}
 	}
-	
-	fileList.push_back(fileName);
-	HFONT newFont = CreateFont(fontSize, 0, 0, 0,
-		FW_REGULAR, FALSE, FALSE, FALSE,
-		SHIFTJIS_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-		ANTIALIASED_QUALITY | PROOF_QUALITY, DEFAULT_PITCH | OUT_DEFAULT_PRECIS,
-		fontName);
-	list.insert(map<string, HFONT>::value_type(fontName, newFont));
+	return true;
 }
 
 void Font::Release()
 {
-	for_each(list.begin(), list.end(), [](pair<string, HFONT> elm) {
-		DeleteObject(elm.second);
+	for_each(list.begin(), list.end(), [](pair<string, FTPixmapFont*> elm) {
+		delete elm.second;
 	});
-	for_each(fileList.begin(), fileList.end(), [](string elm) {
-		RemoveFontResourceEx(elm.c_str(), FR_PRIVATE, NULL);
-	});
+	list.clear();
+	fileList.clear();
+}
+
+void Font::SetSize(string name, int size)
+{
+	list[name]->FaceSize(size);
 }
