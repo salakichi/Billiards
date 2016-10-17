@@ -1,12 +1,10 @@
 #pragma once
 
 #include "MyFtgl.h"
-#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
 #include <algorithm>
-using namespace::std;
 
 #define DEFAULT_FONT_SIZE 32
 

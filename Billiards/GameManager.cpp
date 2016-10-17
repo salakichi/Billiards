@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "GameManager.h"
 
-const char* tableModelPath = "data\\table.x";
-const char* ballModelPath = "data\\%d.x";
+const char* tableModelPath = "data\\model\\table.x";
+const char* ballModelPath = "data\\model\\%d.x";
 const char* skyboxModelPath = "data\\room\\松野家居間_ダンス用.x";
 const char* misakiFontPath = "data\\font\\misaki_gothic.ttf";
 const char* bokuFontPath = "data\\font\\bokutachi.otf";
+const char* bgmPath = "data\\sound\\bgm.wav";
 #define MISAKI_FONT "美咲フォント"
 #define BOKU_FONT "ぼくたちのゴシック"
 
@@ -66,6 +67,12 @@ bool GameManager::Initialize(int argc, char** argv)
 	if (!InitializeGL(argc, argv))
 	{
 		ErrorLog("Initialize() : failed to initialize GL");
+		return false;
+	}
+
+	if (!alutInit(&argc, argv))
+	{
+		ErrorLog("Initialize() : failed to initialize AL");
 		return false;
 	}
 
@@ -274,19 +281,24 @@ bool GameManager::LoadMaterial()
 		loadResult = font.Load(bokuFontPath, BOKU_FONT, 32);
 		if (!loadResult) throw bokuFontPath;
 
+		// BGMの読み込み
+		loadResult = bgm.LoadWave(bgmPath, 0.25f, true);
+		if (!loadResult) throw bgmPath;
+
 		// ローディング終了
 		CloseLoadScreen();
 
 		return true;
 	}
 	catch (const char* str) {
-		char buff[128] = "/0";
-		strcat_s(buff, str);
-		strcat_s(buff, " の読み込みに失敗しました。");
+		char buff[128];
+		sprintf_s(buff, "%s の読み込みに失敗しました。", str);
 		ErrorLog(buff);
 
 		// ローディング終了
 		CloseLoadScreen();
+
+		getchar();
 		return false;
 	}
 }
@@ -323,6 +335,9 @@ void GameManager::InitializeModel()
 			++k;
 		}
 	}
+
+	// サウンド
+	bgm.Play();
 }
 
 void GameManager::Render2D()
@@ -629,40 +644,39 @@ void GameManager::Update()
 
 void GameManager::KeyFunc(KEY key)
 {
-	if (status == MAIN)
+	switch (key)
 	{
-		switch (key)
-		{
-		case KEY_UP:
-			break;
-		case KEY_DOWN:
-			break;
-		case KEY_LEFT:
-			break;
-		case KEY_RIGHT:
-			break;
-		case KEY_W:
-			break;
-		case KEY_A:
-			break;
-		case KEY_S:
-			break;
-		case KEY_D:
-			break;
-		case KEY_V:
-			break;
-		case KEY_SPACE:
-			break;
-		case KEY_ENTER:
-			balls[0].AddVec(glm::vec3(0.25f, 0.f, 0.f));
-			break;
-		case KEY_BACKSPACE:
-			break;
-		case KEY_1:
-		case KEY_2:
-		case KEY_3:
-			break;
-		}
+	case KEY_UP:
+		bgm.AddGain(0.05f);
+		break;
+	case KEY_DOWN:
+		bgm.AddGain(-0.05f);
+		break;
+	case KEY_LEFT:
+		break;
+	case KEY_RIGHT:
+		break;
+	case KEY_W:
+		break;
+	case KEY_A:
+		break;
+	case KEY_S:
+		break;
+	case KEY_D:
+		break;
+	case KEY_V:
+		break;
+	case KEY_SPACE:
+		break;
+	case KEY_ENTER:
+		balls[0].AddVec(glm::vec3(0.25f, 0.f, 0.f));
+		break;
+	case KEY_BACKSPACE:
+		break;
+	case KEY_1:
+	case KEY_2:
+	case KEY_3:
+		break;
 	}
 }
 

@@ -4,6 +4,7 @@
 #include "Mouse.h"
 #include "Ball.h"
 #include "Font.h"
+#include "Sound.h"
 #include <process.h>
 #include <mmsystem.h>
 
@@ -51,6 +52,9 @@ private:
 	XModel tableModel;
 	Ball balls[16];
 	XModel skyboxModel;
+
+	// âπ
+	Sound bgm;
 
 	// ÉJÉÅÉâ
 	ViewCamera camera;

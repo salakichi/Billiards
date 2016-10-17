@@ -10,6 +10,7 @@ void Reshape(int x, int y);
 void Mouse(int button, int state, int x, int y);
 void Motion(int x, int y);
 void Keyboard(unsigned char key, int x, int y);
+void Special(int key, int x, int y);
 
 int main(int argc, char **argv)
 {
@@ -22,6 +23,7 @@ int main(int argc, char **argv)
 	glutMouseFunc(Mouse);
 	glutMotionFunc(Motion);
 	glutKeyboardFunc(Keyboard);
+	glutSpecialFunc(Special);
 	
 	//　ウィンドウを表示
 	glutShowWindow();
@@ -112,6 +114,27 @@ void Keyboard(unsigned char key, int x, int y)
 
 	default:
 		cout << (int)key << endl;
+		break;
+	}
+}
+
+void Special(int key, int x, int y)
+{
+	switch (key)
+	{
+	case GLUT_KEY_LEFT:
+		gm.KeyFunc(KEY_LEFT);
+		break;
+	case GLUT_KEY_UP:
+		gm.KeyFunc(KEY_UP);
+		break;
+	case GLUT_KEY_RIGHT:
+		gm.KeyFunc(KEY_RIGHT);
+		break;
+	case GLUT_KEY_DOWN:
+		gm.KeyFunc(KEY_DOWN);
+		break;
+	default:
 		break;
 	}
 }
