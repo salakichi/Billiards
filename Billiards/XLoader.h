@@ -78,9 +78,9 @@ class XFace
 public:
 	int element;
 	int indexMaterial;
-	glm::uvec4 indexVertices;
-	glm::uvec4 indexNormals;
-	glm::uvec4 indexTexCoords;
+	glm::ivec4 indexVertices;
+	glm::ivec4 indexNormals;
+	glm::ivec4 indexTexCoords;
 	XFace();
 };
 

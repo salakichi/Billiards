@@ -58,7 +58,8 @@ public:
 	virtual void Render2D(){}
 	virtual void Render3D(){}
 	virtual void Update(){}
-	virtual void KeyFunc(KEY key){}
+	virtual void Keyboard(KEY key){}
+	virtual void KeyboardUp(KEY key) {}
 	virtual void Mouse(int button, int state, int x, int y){}
 	virtual void Motion(int x, int y){}
 	virtual void Finish(){}

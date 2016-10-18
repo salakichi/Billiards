@@ -448,9 +448,14 @@ void GameManager::Update()
 	}
 }
 
-void GameManager::KeyFunc(KEY key)
+void GameManager::Keyboard(KEY key)
 {
-	scene->KeyFunc(key);
+	scene->Keyboard(key);
+}
+
+void GameManager::KeyboardUp(KEY key)
+{
+	scene->KeyboardUp(key);
 }
 
 void GameManager::Mouse(int button, int state, int x, int y)

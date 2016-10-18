@@ -85,42 +85,20 @@ void MainScene::Update()
 	}
 }
 
-void MainScene::KeyFunc(KEY key)
+void MainScene::Keyboard(KEY key)
 {
 	switch (key)
 	{
-	case KEY_UP:
-		RSound(TITLE_BGM)->AddGain(0.05f);
-		break;
-	case KEY_DOWN:
-		RSound(TITLE_BGM)->AddGain(-0.05f);
-		break;
-	case KEY_LEFT:
-		break;
-	case KEY_RIGHT:
-		break;
-	case KEY_W:
-		break;
-	case KEY_A:
-		break;
-	case KEY_S:
-		break;
-	case KEY_D:
-		break;
-	case KEY_V:
-		break;
-	case KEY_SPACE:
-		break;
 	case KEY_ENTER:
 		RBall(0)->AddVec(glm::vec3(0.25f, 0.f, 0.f));
 		break;
-	case KEY_BACKSPACE:
-		break;
-	case KEY_1:
-	case KEY_2:
-	case KEY_3:
+	default:
 		break;
 	}
+}
+
+void MainScene::KeyboardUp(KEY key)
+{
 }
 
 void MainScene::Mouse(int button, int state, int x, int y)

@@ -8,7 +8,6 @@ Scene::Scene(ResourceManager &r, glm::uvec2 &size) : resource(r), windowSize(siz
 	FrameCount = 0;
 	CurrentTime = 0.0;
 	LastTime = 0.0;
-	LastCount = 0.0;
 	Fps = 0.0f;
 
 	// Ÿ‚ÌƒV[ƒ“‚ğ‹ó‚É

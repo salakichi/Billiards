@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "TitleScene.h"
 
-
-
 TitleScene::TitleScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 {
 	XModel* tableModel = RModel(TABLE_MODEL);
@@ -54,15 +52,48 @@ void TitleScene::Finish()
 
 void TitleScene::SetCamera()
 {
-	camera.Set();
+	// 30秒の周期にする
+	double elapsedTime = CurrentTime - (double)((int)(CurrentTime / 30.0)) * 30.0;
+	glm::vec3 position;
+	glm::vec3 angle    = glm::vec3(DegToRad(elapsedTime*12.0), DegToRad(45.0), 0.0);
+	glm::vec3 target   = glm::vec3();
+	glm::vec3 upvector = glm::vec3(0.0, 1.0, 0.0);
+	float distance = 50.0f;
+
+	//　視点位置を決定
+	position[0] = sin(angle[0]) * cos(angle[1]) * distance;
+	position[1] = sin(angle[1]) * distance;
+	position[2] = cos(angle[0]) * cos(angle[1]) * distance;
+
+	//　アップベクトルの設定
+	if (angle[1] > DegToRad(90.0) && angle[1] < DegToRad(270.0)) upvector[1] = -1.0;
+	else upvector[1] = 1.0;
+
+	//　視点位置の設定
+	gluLookAt(
+		position[0], position[1], position[2],
+		target[0], target[1], target[2],
+		upvector[0], upvector[1], upvector[2]);
 }
 
 void TitleScene::Render2D()
 {
+	// 2秒の周期にする
+	double elapsedTime = CurrentTime - (double)((int)(CurrentTime / 2.0)) * 2.0;
+	double rate = elapsedTime;
+	if (elapsedTime > 1.0)
+	{
+		rate = 2.0 - elapsedTime;
+	}
+
 	// FPSの描画
+	glColor4f(1.f, 1.f, 1.f, 1.f);
 	drawText(FpsString, BOKU_FONT, glm::uvec2(20, 40), glm::vec2());
 
-	drawText("OpenGL Billiards", MISAKI_FONT, glm::uvec2(windowSize.x/2-110, 150), glm::vec2());
+	drawText("OpenGL Billiards", MISAKI_FONT, glm::uvec2(windowSize.x / 2 - 120, windowSize.y / 4), glm::vec2());
+
+	glColor4f(1.f, 1.f, 1.f, (float)rate);
+	drawText("Press Enter", MISAKI_FONT, glm::uvec2(windowSize.x / 2 - 80, windowSize.y * 3 / 4), glm::vec2());
 }
 
 void TitleScene::Render3D()
@@ -94,7 +125,7 @@ void TitleScene::Update()
 	}
 }
 
-void TitleScene::KeyFunc(KEY key)
+void TitleScene::Keyboard(KEY key)
 {
 	switch (key)
 	{
@@ -104,32 +135,16 @@ void TitleScene::KeyFunc(KEY key)
 	case KEY_DOWN:
 		RSound(TITLE_BGM)->AddGain(-0.05f);
 		break;
-	case KEY_LEFT:
-		break;
-	case KEY_RIGHT:
-		break;
-	case KEY_W:
-		break;
-	case KEY_A:
-		break;
-	case KEY_S:
-		break;
-	case KEY_D:
-		break;
-	case KEY_V:
-		break;
-	case KEY_SPACE:
-		break;
 	case KEY_ENTER:
 		Next(MAIN);
 		break;
-	case KEY_BACKSPACE:
-		break;
-	case KEY_1:
-	case KEY_2:
-	case KEY_3:
+	default:
 		break;
 	}
+}
+
+void TitleScene::KeyboardUp(KEY key)
+{
 }
 
 void TitleScene::Mouse(int button, int state, int x, int y)

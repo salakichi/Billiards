@@ -32,7 +32,8 @@ public:
 	bool Initialize(int argc, char** argv);
 	void Release();
 	void Render();
-	void KeyFunc(KEY key);
+	void Keyboard(KEY key);
+	void KeyboardUp(KEY key);
 	void Mouse(int button, int state, int x, int y);
 	void Motion(int x, int y);
 	void Update();

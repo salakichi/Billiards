@@ -10,8 +10,6 @@
 class TitleScene : public Scene
 {
 private:
-	// ÉJÉÅÉâ
-	ViewCamera camera;
 public:
 	TitleScene(ResourceManager& resource, glm::uvec2 &size);
 	~TitleScene();
@@ -19,7 +17,8 @@ public:
 	void Render2D();
 	void Render3D();
 	void Update();
-	void KeyFunc(KEY key);
+	void Keyboard(KEY key);
+	void KeyboardUp(KEY key);
 	void Mouse(int button, int state, int x, int y);
 	void Motion(int x, int y);
 	void Finish();

@@ -125,7 +125,7 @@ static void SkipNode()
 static int substring(char *src, char* dest, const char *str1, const char *str2)
 {
 	char *from, *to;
-	int len;
+	size_t len;
 
 	if ((from = strstr(src, str1)) == NULL)
 		return 0;
@@ -141,7 +141,7 @@ static int substring(char *src, char* dest, const char *str1, const char *str2)
 static void strdelete(char *buf, const char *str1)
 {
 	char *p;
-	int strLen, bufLen;
+	size_t strLen, bufLen;
 
 	strLen = strlen(str1);
 	while ((p = strstr(buf, str1)) != NULL) {
@@ -282,25 +282,25 @@ void XMesh::Release()
 	if (vertex)
 	{
 		free((glm::vec3*)vertex);
-		vertex = NULL;
+		vertex = nullptr;
 	}
 
 	if (normal)
 	{
 		free((glm::vec3*)normal);
-		normal = NULL;
+		normal = nullptr;
 	}
 
 	if (texcoord)
 	{
 		free((glm::vec2*)texcoord);
-		texcoord = NULL;
+		texcoord = nullptr;
 	}
 
 	if (face)
 	{
 		free((XFace*)face);
-		face = NULL;
+		face = nullptr;
 	}
 
 	numVertices = 0;
@@ -389,18 +389,18 @@ void XModel::Release()
 	if (matArr)
 	{
 		delete[] matArr;
-		matArr = NULL;
+		matArr = nullptr;
 	}
 	if (matList)
 	{
 		delete[] matList;
-		matList = NULL;
+		matList = nullptr;
 	}
 	if (vbo)
 	{
 		glDeleteBuffers(numMeshes * 4, vbo);
 		delete[] vbo;
-		vbo = NULL;
+		vbo = nullptr;
 	}
 	numMaterials = 0;
 	numMeshes = 0;
@@ -514,7 +514,7 @@ bool XModel::Load(char *filename, float scale)
 	{
 		while (strrchr(p + 1, '\\'))
 			p = strrchr(buff, '\\');
-		int dirNameSize = p - buff + 1;
+		__int64 dirNameSize = p - buff + 1;
 		dirName = new char[dirNameSize + 1];
 		strncpy_s(dirName, dirNameSize + 1, buff, dirNameSize);
 		dirName[dirNameSize] = '\0';
@@ -542,13 +542,13 @@ bool XModel::Load(char *filename, float scale)
 	buffer[fileSize] = '\0';
 
 	//　バッファに格納
-	int read_size = fread_s(buffer, fileSize, fileSize, 1, fp);
+	size_t read_size = fread_s(buffer, fileSize, fileSize, 1, fp);
 	fclose(fp);
 
 	//　サイズチェック
 	if (read_size != 1)
 	{
-		cout << "Error : 読み込みサイズとサイズが一致していません\n";
+		cout << "XLoader Error : 読み込みサイズとサイズが一致していません\n";
 		return false;
 	}
 
@@ -977,7 +977,7 @@ bool XModel::Load(char *filename, float scale)
 		meshList.push_back(mesh);
 		mesh = nullptr;
 	}
-	numMeshes = meshList.size();
+	numMeshes = (int)meshList.size();
 
 	if (buffer)
 	{
@@ -1021,6 +1021,7 @@ bool XModel::Load(char *filename, float scale)
 		vbo = new GLuint[numMeshes * 4];
 	}
 
+	// マテリアル別に並べかえる
 	for (i = 0; i<numMeshes; i++)
 	{
 		if (meshList[i]->numVertices < meshList[i]->numTexCoords)
@@ -1206,9 +1207,6 @@ bool XModel::Load(char *filename, float scale)
 //---------------------------------------------------------------------------------------------------
 void XModel::RenderMesh(int index)
 {
-	if (vbo == NULL || vbo[index * 4 + 0] <= 0 || vbo[index * 4 + 1] <= 0 || vbo[index * 4 + 2] <= 0 || vbo[index * 4 + 3] <= 0)
-		return;
-
 	glPushMatrix();
 	
 	if (rotationFlag)
