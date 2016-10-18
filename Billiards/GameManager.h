@@ -3,10 +3,7 @@
 // ゲーム管理用クラス
 
 #include "TitleScene.h"
-
-enum GAME_STATUS {
-	TITLE, MAIN, CONTINUE, GAMECLEAR, GAMEOVER,
-};
+#include "MainScene.h"
 
 class GameManager
 {
@@ -17,9 +14,6 @@ private:
 	void Render3D();
 	void RenderWithoutShadow();
 	void RenderWithShadow();
-
-	// 遷移用
-	GAME_STATUS status;
 
 	// シャドウ用
 	GLuint shadowTexture;
@@ -44,5 +38,4 @@ public:
 	uint GetWindowHeight();
 	uint GetWindowPosX();
 	uint GetWindowPosY();
-	GAME_STATUS GetStatus() { return status; };
 };

@@ -16,8 +16,6 @@ glm::uvec2 windowSize;
 
 GameManager::GameManager()
 {
-	status = TITLE;
-
 	windowSize.x = WINDOW_DEFAULT_W;
 	windowSize.y = WINDOW_DEFAULT_H;
 	windowPos.x = WINDOW_DEFAULT_POS_X;
@@ -427,7 +425,31 @@ void GameManager::Render()
 
 void GameManager::Update()
 {
-	scene->Update();
+	if (scene->IsFinished())
+	{
+		// ‰æ–Ê‘JˆÚ
+		GAME_STATUS next = scene->GetNextScene();
+		scene->Finish();
+		delete scene;
+
+		switch (next)
+		{
+		case TITLE:
+			scene = new TitleScene(resource);
+			break;
+		case MAIN:
+			scene = new MainScene(resource);
+			break;
+		default:
+			ErrorLog("Unknown Scene");
+			break;
+		}
+	}
+	else
+	{
+		scene->UpdateFps();
+		scene->Update();
+	}
 }
 
 void GameManager::KeyFunc(KEY key)
@@ -466,6 +488,6 @@ void GameManager::SetWindowSize(int x, int y)
 	//@Ë‰es—ñ‚Ìİ’è
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0, 1.0, 0.1, 1000.0);
+	gluPerspective(45.0, (GLdouble)windowSize.x/(GLdouble)windowSize.y, 0.1, 1000.0);
 }
 

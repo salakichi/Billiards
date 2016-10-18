@@ -10,10 +10,33 @@ Scene::Scene(ResourceManager &r) : resource(r)
 	LastTime = 0.0;
 	LastCount = 0.0;
 	Fps = 0.0f;
+
+	// 次のシーンを空に
+	nextScene = NONE;
 }
 
 Scene::~Scene()
 {
+}
+
+void Scene::Next(GAME_STATUS next)
+{
+	nextScene = next;
+}
+
+void Scene::UpdateFps()
+{
+	//　時間計測とFPS算出
+	CurrentCount = glutGet(GLUT_ELAPSED_TIME);
+	CurrentTime = (CurrentCount - LastCount) / 1000.0;
+	FrameCount++;
+	if ((CurrentTime - LastTime) >= 1.0)
+	{
+		Fps = FrameCount / (CurrentTime - LastTime);
+		sprintf_s(FpsString, "%.3f FPS", Fps);
+		FrameCount = 0;
+		LastTime = CurrentTime;
+	}
 }
 
 void Scene::DrawSmallCircle(float radius, int x, int y)

@@ -10,6 +10,10 @@ enum KEY {
 	KEY_SPACE, KEY_ENTER, KEY_BACKSPACE, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5
 };
 
+enum GAME_STATUS {
+	NONE, TITLE, MAIN, CONTINUE, GAMECLEAR, GAMEOVER,
+};
+
 class Scene
 {
 protected:
@@ -20,6 +24,7 @@ protected:
 	double LastCount;
 	int FrameCount;
 	double Fps;
+	char FpsString[50];
 
 	// リソースアクセス用
 	ResourceManager& resource;
@@ -27,6 +32,10 @@ protected:
 	Ball* RBall(int i) { return resource.balls[i]; }
 	Sound* RSound(string name) { return resource.soundList[name]; }
 	Font* RFont(string name) { return resource.fontList[name]; }
+
+	// シーン遷移用
+	GAME_STATUS nextScene;
+	void Next(GAME_STATUS next);
 
 	// 共通描画関数（2D用）
 	void glutRenderText(void* bitmapfont, char*text);
@@ -37,6 +46,11 @@ protected:
 public:
 	Scene(ResourceManager &r);
 	~Scene();
+	void UpdateFps();
+	bool IsFinished() { return nextScene != NONE; }
+	GAME_STATUS GetNextScene() { return nextScene; }
+
+	// 仮想関数
 	virtual void SetCamera(){}
 	virtual void Render2D(){}
 	virtual void Render3D(){}
@@ -44,4 +58,5 @@ public:
 	virtual void KeyFunc(KEY key){}
 	virtual void Mouse(int button, int state, int x, int y){}
 	virtual void Motion(int x, int y){}
+	virtual void Finish(){}
 };

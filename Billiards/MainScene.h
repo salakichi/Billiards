@@ -3,18 +3,18 @@
 #include "Scene.h"
 #include "Mouse.h"
 
-// タイトル用シーン
+// ゲームメイン用シーン
 
 #define M_PI 3.1415926535f
 
-class TitleScene : public Scene
+class MainScene : public Scene
 {
 private:
 	// カメラ
 	ViewCamera camera;
 public:
-	TitleScene(ResourceManager& resource);
-	~TitleScene();
+	MainScene(ResourceManager& resource);
+	~MainScene();
 	void SetCamera();
 	void Render2D();
 	void Render3D();

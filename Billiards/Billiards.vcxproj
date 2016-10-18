@@ -161,6 +161,7 @@
     <ClInclude Include="Font.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="lodepng.h" />
+    <ClInclude Include="MainScene.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="MyAlut.h" />
     <ClInclude Include="MyFreeglut.h" />
@@ -183,6 +184,7 @@
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="lodepng.cpp" />
+    <ClCompile Include="MainScene.cpp" />
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Scene.cpp" />

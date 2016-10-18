@@ -1,9 +1,7 @@
 #include "stdafx.h"
-#include "TitleScene.h"
+#include "MainScene.h"
 
-
-
-TitleScene::TitleScene(ResourceManager& rm) : Scene(rm)
+MainScene::MainScene(ResourceManager& rm) : Scene(rm)
 {
 	XModel* tableModel = RModel(TABLE_MODEL);
 
@@ -37,35 +35,28 @@ TitleScene::TitleScene(ResourceManager& rm) : Scene(rm)
 			++k;
 		}
 	}
-
-	// BGMÇó¨Ç∑
-	RSound(TITLE_BGM)->Play();
 }
 
-TitleScene::~TitleScene()
+MainScene::~MainScene()
 {
 }
 
-void TitleScene::Finish()
+void MainScene::Finish()
 {
-	// BGMÇSTOP
-	RSound(TITLE_BGM)->Stop();
 }
 
-void TitleScene::SetCamera()
+void MainScene::SetCamera()
 {
 	camera.Set();
 }
 
-void TitleScene::Render2D()
+void MainScene::Render2D()
 {
-	// FPSÇÃï`âÊ
-	drawText(FpsString, BOKU_FONT, glm::uvec2(20, 40), glm::vec2());
-
-	drawText("OpenGL Billiards", MISAKI_FONT, glm::uvec2(100, 100), glm::vec2());
+	//Å@ï∂éöÇÃï`âÊ
+	drawText((char *)FpsString, BOKU_FONT, glm::uvec2(20, 40), glm::vec2());
 }
 
-void TitleScene::Render3D()
+void MainScene::Render3D()
 {
 	for (int i = 0; i <= 16; ++i)
 	{
@@ -75,7 +66,7 @@ void TitleScene::Render3D()
 	RModel(STAGE_MODEL)->Render();
 }
 
-void TitleScene::Update()
+void MainScene::Update()
 {
 	for (int i = 0; i < 16; ++i)
 	{
@@ -94,7 +85,7 @@ void TitleScene::Update()
 	}
 }
 
-void TitleScene::KeyFunc(KEY key)
+void MainScene::KeyFunc(KEY key)
 {
 	switch (key)
 	{
@@ -121,7 +112,7 @@ void TitleScene::KeyFunc(KEY key)
 	case KEY_SPACE:
 		break;
 	case KEY_ENTER:
-		Next(MAIN);
+		RBall(0)->AddVec(glm::vec3(0.25f, 0.f, 0.f));
 		break;
 	case KEY_BACKSPACE:
 		break;
@@ -132,10 +123,12 @@ void TitleScene::KeyFunc(KEY key)
 	}
 }
 
-void TitleScene::Mouse(int button, int state, int x, int y)
+void MainScene::Mouse(int button, int state, int x, int y)
 {
+	camera.MouseInput(button, state, x, y);
 }
 
-void TitleScene::Motion(int x, int y)
+void MainScene::Motion(int x, int y)
 {
+	camera.MouseMotion(x, y);
 }
