@@ -173,7 +173,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Texture.h" />
-    <ClInclude Include="TgaReader.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="TitleScene.h" />
     <ClInclude Include="XLoader.h" />
@@ -196,7 +195,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="TgaReader.cpp" />
     <ClCompile Include="TitleScene.cpp" />
     <ClCompile Include="XLoader.cpp" />
   </ItemGroup>

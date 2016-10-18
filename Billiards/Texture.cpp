@@ -242,49 +242,21 @@ bool Texture::Load(char* path)
 
 		fclose(fp);
 	}
-	// tgaå`éÆÇÃèÍçá
-	else if (strcmp(fileEx, "tga") == 0)
-	{
-		FILE *fp;
-		int fileSize;
-		byte *buff;
-
-		struct _stat buf;
-		int result = _stat(filepath, &buf);
-		if (result != 0)
-		{
-			cout << "Texture Loader Error : file " << path << " not exists" << endl;
-			return false;
-		}
-		fileSize = buf.st_size;
-
-		if (fopen_s(&fp, path, "rb"))
-		{
-			cout << "Texture Loader Error : LoadTga() can't open file " << path << endl;
-			return false;
-		}
-
-		buff = new byte[fileSize];
-		fread_s(buff, fileSize, fileSize, 1, fp);
-
-		image = (GLubyte*)tgaRead(buff, TGA_READER_RGBA);
-		nChannels = buff[16] / 8;
-
-		delete[] buff;
-	}
 	// ÇªÇÃëºÇÃèÍçá
 	else {
 		IplImage* cvImage = cvLoadImage(path);
+		int size = 0;
 
 		width = cvImage->width;
 		height = cvImage->height;
 		nChannels = cvImage->nChannels;
+		size = width*height*nChannels;
 
 		if (cvImage)
 		{
-			image = new GLubyte[width*height*nChannels];
+			image = new GLubyte[size];
 
-			for (int i = 0; i < width*height*nChannels; i += nChannels)
+			for (int i = 0; i < size; i += nChannels)
 			{
 				image[i] = cvImage->imageData[i + 2];        // R
 				image[i + 1] = cvImage->imageData[i + 1];   // G
