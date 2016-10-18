@@ -12,4 +12,8 @@ OpenGLのビリヤード。
 
 # その他使用しているライブラリ
 * LodePNG
-* tga reader
+
+# ライブラリビルドの参考文献
+* http://blog.kintarou.com/2016/03/21/bilding_opencv3-1-0_gui/
+* http://slis.tsukuba.ac.jp/~fujisawa.makoto.fu/lecture/iml/text/screen_character.html
+* http://c-crad.wktk.so/td/?p=314
