@@ -37,6 +37,9 @@ protected:
 	GAME_STATUS nextScene;
 	void Next(GAME_STATUS next);
 
+	// 画面サイズ
+	glm::uvec2 &windowSize;
+
 	// 共通描画関数（2D用）
 	void glutRenderText(void* bitmapfont, char*text);
 	void DrawSmallCircle(float radius, int x, int y);		// 半径32.0まで 品質：良
@@ -44,7 +47,7 @@ protected:
 	int drawText(char *text, string fontName, glm::uvec2 pos, glm::vec2 move);
 	int drawText(char *text, string fontName, glm::uvec2 pos, glm::vec2 move, glm::vec4 mainColor, glm::vec4 edgeColor, int edgeSize);
 public:
-	Scene(ResourceManager &r);
+	Scene(ResourceManager &r, glm::uvec2 &size);
 	~Scene();
 	void UpdateFps();
 	bool IsFinished() { return nextScene != NONE; }

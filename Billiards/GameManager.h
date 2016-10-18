@@ -23,6 +23,9 @@ private:
 
 	// シーン
 	Scene* scene;
+
+	// ウィンドウ用
+	glm::uvec2 windowSize;
 public:
 	GameManager();
 	~GameManager();
@@ -34,8 +37,4 @@ public:
 	void Motion(int x, int y);
 	void Update();
 	void SetWindowSize(int x, int y);
-	uint GetWindowWidth();
-	uint GetWindowHeight();
-	uint GetWindowPosX();
-	uint GetWindowPosY();
 };

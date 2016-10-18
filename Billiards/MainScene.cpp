@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MainScene.h"
 
-MainScene::MainScene(ResourceManager& rm) : Scene(rm)
+MainScene::MainScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 {
 	XModel* tableModel = RModel(TABLE_MODEL);
 

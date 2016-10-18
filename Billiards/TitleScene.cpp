@@ -3,7 +3,7 @@
 
 
 
-TitleScene::TitleScene(ResourceManager& rm) : Scene(rm)
+TitleScene::TitleScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 {
 	XModel* tableModel = RModel(TABLE_MODEL);
 
@@ -62,7 +62,7 @@ void TitleScene::Render2D()
 	// FPS‚Ì•`‰æ
 	drawText(FpsString, BOKU_FONT, glm::uvec2(20, 40), glm::vec2());
 
-	drawText("OpenGL Billiards", MISAKI_FONT, glm::uvec2(100, 100), glm::vec2());
+	drawText("OpenGL Billiards", MISAKI_FONT, glm::uvec2(windowSize.x/2-110, 150), glm::vec2());
 }
 
 void TitleScene::Render3D()

@@ -13,7 +13,7 @@ private:
 	// ƒJƒƒ‰
 	ViewCamera camera;
 public:
-	TitleScene(ResourceManager& resource);
+	TitleScene(ResourceManager& resource, glm::uvec2 &size);
 	~TitleScene();
 	void SetCamera();
 	void Render2D();

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Scene.h"
 
-Scene::Scene(ResourceManager &r) : resource(r)
+Scene::Scene(ResourceManager &r, glm::uvec2 &size) : resource(r), windowSize(size)
 {
 	//　カウンターの初期化
 	CurrentCount = LastCount = glutGet(GLUT_ELAPSED_TIME);

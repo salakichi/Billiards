@@ -11,15 +11,10 @@ static const GLfloat lightamb[] = { 0.1f, 0.1f, 0.1f, 1.f }; /* 環境光強度　　　
 #define DEPTH_TEX_HEIGHT 512
 //#define SHADOW_MAP_ON
 
-glm::uvec2 windowPos;
-glm::uvec2 windowSize;
-
 GameManager::GameManager()
 {
 	windowSize.x = WINDOW_DEFAULT_W;
 	windowSize.y = WINDOW_DEFAULT_H;
-	windowPos.x = WINDOW_DEFAULT_POS_X;
-	windowPos.y = WINDOW_DEFAULT_POS_Y;
 }
 
 GameManager::~GameManager()
@@ -51,7 +46,8 @@ bool GameManager::Initialize(int argc, char** argv)
 		return false;
 	}
 
-	scene = new TitleScene(resource);
+	// タイトル画面へ
+	scene = new TitleScene(resource, windowSize);
 
 	return true;
 }
@@ -64,7 +60,7 @@ void GameManager::Release()
 bool GameManager::InitializeGL(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitWindowPosition(windowPos.x, windowPos.y);
+	glutInitWindowPosition(WINDOW_DEFAULT_POS_X, WINDOW_DEFAULT_POS_Y);
 	glutInitWindowSize(windowSize.x, windowSize.y);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
 	glutCreateWindow("ビリヤード");
@@ -435,10 +431,10 @@ void GameManager::Update()
 		switch (next)
 		{
 		case TITLE:
-			scene = new TitleScene(resource);
+			scene = new TitleScene(resource, windowSize);
 			break;
 		case MAIN:
-			scene = new MainScene(resource);
+			scene = new MainScene(resource, windowSize);
 			break;
 		default:
 			ErrorLog("Unknown Scene");
@@ -466,11 +462,6 @@ void GameManager::Motion(int x, int y)
 {
 	scene->Motion(x, y);
 }
-
-uint GameManager::GetWindowWidth() { return windowSize.x; }
-uint GameManager::GetWindowHeight() { return windowSize.y; }
-uint GameManager::GetWindowPosX() { return windowPos.x; }
-uint GameManager::GetWindowPosY() { return windowPos.y; }
 
 void GameManager::SetWindowSize(int x, int y)
 {
