@@ -182,49 +182,6 @@ XFace::XFace()
 	}
 }
 
-//--------------------------------------------------------------------------------------------------
-// operator =
-//--------------------------------------------------------------------------------------------------
-XFace& XFace::operator =(XFace &ob)
-{
-	element = ob.element;
-	indexMaterial = ob.indexMaterial;
-	for (int i = 0; i<4; i++)
-	{
-		indexVertices[i] = ob.indexVertices[i];
-		indexNormals[i] = ob.indexNormals[i];
-		indexTexCoords[i] = ob.indexTexCoords[i];
-	}
-	return (*this);
-}
-
-//--------------------------------------------------------------------------------------------------
-// Name : SetVertexIndex()
-// Desc : 頂点インデックスをセットする
-//--------------------------------------------------------------------------------------------------
-void XFace::SetVertexIndex(int index[])
-{
-	for (int i = 0; i<4; i++) indexVertices[i] = index[i];
-}
-
-//--------------------------------------------------------------------------------------------------
-// Name : SetNormalIndex()
-// Desc : 法線インデックスをセットする
-//--------------------------------------------------------------------------------------------------
-void XFace::SetNormalIndex(int index[])
-{
-	for (int i = 0; i<4; i++) indexNormals[i] = index[i];
-}
-
-//--------------------------------------------------------------------------------------------------
-// Name : SetTexCoordIndex()
-// Desc : テクスチャ座標インデックスをセットする
-//--------------------------------------------------------------------------------------------------
-void XFace::SetTexCoordIndex(int index[])
-{
-	for (int i = 0; i<4; i++) indexTexCoords[i] = index[i];
-}
-
 ////////////////////////////////////////////////////////////////////////
 // XMaterial class
 ////////////////////////////////////////////////////////////////////////
@@ -310,82 +267,10 @@ XMesh::XMesh()
 	numNormals = 0;
 	numTexCoords = 0;
 	numFaces = 0;
-	vertex = (glm::vec3*)malloc(1 * sizeof(glm::vec3));
-	normal = (glm::vec3*)malloc(1 * sizeof(glm::vec3));
-	texcoord = (glm::vec2*)malloc(1 * sizeof(glm::vec2));
-	face = (XFace*)malloc(1 * sizeof(XFace));
-}
-
-//--------------------------------------------------------------------------------------------------
-// operator =
-//--------------------------------------------------------------------------------------------------
-XMesh& XMesh::operator= (XMesh &ob)
-{
-	strcpy_s(name, ob.name);
-	numVertices = ob.numVertices;
-	numNormals = ob.numNormals;
-	numTexCoords = ob.numTexCoords;
-	numFaces = ob.numFaces;
-
-	vertex = (glm::vec3*)malloc(numVertices * sizeof(glm::vec3));
-	normal = (glm::vec3*)malloc(numNormals * sizeof(glm::vec3));
-	texcoord = (glm::vec2*)malloc(numTexCoords * sizeof(glm::vec2));
-	face = (XFace*)malloc(numFaces * sizeof(XFace));
-
-	for (int i = 0; i<numVertices; i++)		vertex[i] = ob.vertex[i];
-	for (int i = 0; i<numNormals; i++)		normal[i] = ob.normal[i];
-	for (int i = 0; i<numTexCoords; i++)		texcoord[i] = ob.texcoord[i];
-	for (int i = 0; i<numFaces; i++)		face[i] = ob.face[i];
-
-	return (*this);
-}
-
-//--------------------------------------------------------------------------------------------------
-// Name : AddVertex()
-// Desc : 頂点を追加する
-//--------------------------------------------------------------------------------------------------
-int XMesh::AddVertex(glm::vec3 &ob)
-{
-	numVertices++;
-	vertex = (glm::vec3*)realloc(vertex, numVertices * sizeof(glm::vec3));
-	vertex[numVertices - 1] = ob;
-	return numVertices;
-}
-
-//--------------------------------------------------------------------------------------------------
-// Name : AddNormal()
-// Desc : 法線を追加する
-//--------------------------------------------------------------------------------------------------
-int XMesh::AddNormal(glm::vec3 &ob)
-{
-	numNormals++;
-	normal = (glm::vec3*)realloc(normal, numNormals * sizeof(glm::vec3));
-	normal[numNormals - 1] = ob;
-	return numNormals;
-}
-
-//--------------------------------------------------------------------------------------------------
-// Name : AddTexCoord()
-// Desc : テクスチャ座標を追加する
-//--------------------------------------------------------------------------------------------------
-int XMesh::AddTexCoord(glm::vec2 &ob)
-{
-	numTexCoords++;
-	texcoord = (glm::vec2*)realloc(texcoord, numTexCoords * sizeof(glm::vec2));
-	texcoord[numTexCoords - 1] = ob;
-	return numTexCoords;
-}
-
-//--------------------------------------------------------------------------------------------------
-// Name : AddFace()
-// Desc : 面を追加する
-//--------------------------------------------------------------------------------------------------
-int XMesh::AddFace(XFace &ob)
-{
-	numFaces++;
-	face = (XFace*)realloc(face, numFaces * sizeof(XFace));
-	face[numFaces - 1] = ob;
-	return numFaces;
+	vertex = nullptr;
+	normal = nullptr;
+	texcoord = nullptr;
+	face = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -445,24 +330,14 @@ XModel::XModel()
 {
 	numMeshes = 0;
 	numMaterials = 0;
-	mesh = (XMesh*)malloc(1 * sizeof(XMesh));
 	position = glm::vec3(0.f);
 	rotation = glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(1.0, 0.0, 0.0));
 	box.min = glm::vec3(0.f);
 	box.max = glm::vec3(0.f);
 	rotationFlag = false;
-}
-
-//--------------------------------------------------------------------------------------------------
-// Name : AddMesh()
-// Desc : メッシュを追加する
-//--------------------------------------------------------------------------------------------------
-int XModel::AddMesh(XMesh ob)
-{
-	numMeshes++;
-	mesh = (XMesh*)realloc(mesh, numMeshes * sizeof(XMesh));
-	mesh[numMeshes - 1] = ob;
-	return numMeshes;
+	matArr = nullptr;
+	matList = nullptr;
+	vbo = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -511,11 +386,6 @@ void XModel::DeleteMaterial(XMaterial ob)
 void XModel::Release()
 {
 	material.clear();
-	if (mesh)
-	{
-		free((XMesh*)mesh);
-		mesh = NULL;
-	}
 	if (matArr)
 	{
 		delete[] matArr;
@@ -540,7 +410,7 @@ void XModel::Release()
 // Name : ComputeBoundingSphere()
 // Desc : バウンディングスフィアを計算する
 //--------------------------------------------------------------------------------------------------
-void XModel::ComputeBoundingSphere()
+void XModel::ComputeBoundingSphere(vector<XMesh*> meshList)
 {
 	int count = 0;
 	float tempRadius = 0.0f;
@@ -552,11 +422,11 @@ void XModel::ComputeBoundingSphere()
 	//　中心座標の算出
 	for (int i = 0; i<numMeshes; i++)
 	{
-		for (int j = 0; j<mesh[i].numVertices; j++)
+		for (int j = 0; j<meshList[i]->numVertices; j++)
 		{
-			tempCenter.x += mesh[i].vertex[j].x;
-			tempCenter.y += mesh[i].vertex[j].y;
-			tempCenter.z += mesh[i].vertex[j].z;
+			tempCenter.x += meshList[i]->vertex[j].x;
+			tempCenter.y += meshList[i]->vertex[j].y;
+			tempCenter.z += meshList[i]->vertex[j].z;
 			count++;
 		}
 	}
@@ -567,13 +437,13 @@ void XModel::ComputeBoundingSphere()
 	//　半径の算出
 	for (int i = 0; i<numMeshes; i++)
 	{
-		for (int j = 0; j<mesh[i].numVertices; j++)
+		for (int j = 0; j<meshList[i]->numVertices; j++)
 		{
 			float d = 0.0f;
 			glm::vec3 temp;
-			temp.x = mesh[i].vertex[j].x - tempCenter.x;
-			temp.y = mesh[i].vertex[j].y - tempCenter.y;
-			temp.z = mesh[i].vertex[j].z - tempCenter.z;
+			temp.x = meshList[i]->vertex[j].x - tempCenter.x;
+			temp.y = meshList[i]->vertex[j].y - tempCenter.y;
+			temp.z = meshList[i]->vertex[j].z - tempCenter.z;
 			d = sqrt(temp.x*temp.x + temp.y*temp.y + temp.z*temp.z);
 			tempRadius = (tempRadius < d) ? d : tempRadius;
 		}
@@ -588,28 +458,32 @@ void XModel::ComputeBoundingSphere()
 // Name : ComputeBoundingBox()
 // Desc : バウンディングボックスを計算する
 //--------------------------------------------------------------------------------------------------
-void XModel::ComputeBoundingBox()
+void XModel::ComputeBoundingBox(vector<XMesh*> meshList)
 {
-	glm::vec3 tempMin, tempMax;
+	glm::vec3 tempMin = glm::vec3();
+	glm::vec3 tempMax = glm::vec3();
 
-	//　最初の頂点で初期化
-	tempMin = tempMax = mesh[0].vertex[0];
-
-	for (int i = 0; i<numMeshes; i++)
+	if (numMeshes > 0)
 	{
-		for (int j = 0; j<mesh[i].numVertices; j++)
+		//　最初の頂点で初期化
+		tempMin = tempMax = meshList[0]->vertex[0];
+
+		for (int i = 0; i<numMeshes; i++)
 		{
-			//　x成分
-			if (tempMin.x > mesh[i].vertex[j].x) tempMin.x = mesh[i].vertex[j].x;
-			if (tempMax.x < mesh[i].vertex[j].x) tempMax.x = mesh[i].vertex[j].x;
+			for (int j = 0; j<meshList[i]->numVertices; j++)
+			{
+				//　x成分
+				if (tempMin.x > meshList[i]->vertex[j].x) tempMin.x = meshList[i]->vertex[j].x;
+				if (tempMax.x < meshList[i]->vertex[j].x) tempMax.x = meshList[i]->vertex[j].x;
 
-			//　y成分
-			if (tempMin.y > mesh[i].vertex[j].y) tempMin.y = mesh[i].vertex[j].y;
-			if (tempMax.y < mesh[i].vertex[j].y) tempMax.y = mesh[i].vertex[j].y;
+				//　y成分
+				if (tempMin.y > meshList[i]->vertex[j].y) tempMin.y = meshList[i]->vertex[j].y;
+				if (tempMax.y < meshList[i]->vertex[j].y) tempMax.y = meshList[i]->vertex[j].y;
 
-			//　z成分
-			if (tempMin.z > mesh[i].vertex[j].z) tempMin.z = mesh[i].vertex[j].z;
-			if (tempMax.z < mesh[i].vertex[j].z) tempMax.z = mesh[i].vertex[j].z;
+				//　z成分
+				if (tempMin.z > meshList[i]->vertex[j].z) tempMin.z = meshList[i]->vertex[j].z;
+				if (tempMax.z < meshList[i]->vertex[j].z) tempMax.z = meshList[i]->vertex[j].z;
+			}
 		}
 	}
 
@@ -624,17 +498,12 @@ void XModel::ComputeBoundingBox()
 //--------------------------------------------------------------------------------------------------
 bool XModel::Load(char *filename, float scale)
 {
-	//　カウント用変数など	
-	bool b_Mesh = false;
+	//　カウント用変数など
 	int matCount = 0;
-	int vertCount = 0;
-	int faceCount = 0;
-	int normCount = 0;
-	int uvCount = 0;
 	int meshCount = 0;
 
-	XFace* tempFace = NULL;
-	XMesh tempMesh;
+	XMesh* mesh = nullptr;
+	vector<XMesh*> meshList;
 
 	// get relative directory path
 	char* dirName;
@@ -706,6 +575,16 @@ bool XModel::Load(char *filename, float scale)
 		//　Meshの場合
 		else if (CheckToken("Mesh"))
 		{
+			//　カウント数が1より大きい場合
+			if (mesh != nullptr)
+			{
+				//　メッシュを追加
+				meshList.push_back(mesh);
+				mesh = nullptr;
+			}
+
+			mesh = new XMesh();
+
 			//　トークンを取得
 			GetToken();
 
@@ -713,7 +592,7 @@ bool XModel::Load(char *filename, float scale)
 			if (!CheckToken("{"))
 			{
 				//　名前をセット
-				tempMesh.SetName(Token);
+				mesh->SetName(Token);
 
 				//　トークンを取得
 				GetToken("{");
@@ -727,73 +606,34 @@ bool XModel::Load(char *filename, float scale)
 				sprintf_s(tempName, "%s%d", tempName, meshCount + 1);
 
 				//　名前をセット
-				tempMesh.SetName(tempName);
+				mesh->SetName(tempName);
 			}
-
-			//　メッシュ数をカウントする
-			meshCount++;
-
-			//　カウント数が1より大きい場合
-			if (meshCount > 1)
-			{
-				//　面データを追加
-				for (int i = 0; i<faceCount; i++)
-					tempMesh.AddFace(tempFace[i]);
-
-				//　メッシュを追加
-				AddMesh(tempMesh);
-
-				//　確保したメモリを解放
-				if (tempFace)
-				{
-					delete[] tempFace;
-					tempFace = NULL;
-				}
-
-				//　ゼロに戻す
-				ZeroMemory(&tempMesh, sizeof(tempMesh));
-			}
-
-			//　頂点数のカウンターを0に戻す
-			vertCount = 0;
 
 			//　トークンから頂点数を取得
-			vertCount = GetIntToken();
+			mesh->numVertices = GetIntToken();
 
-			for (int i = 0; i<vertCount; i++)
+			// メモリを確保
+			mesh->vertex = new glm::vec3[mesh->numVertices];
+
+			for (int i = 0; i<mesh->numVertices; i++)
 			{
 				//　トークンから頂点データを取得
-				glm::vec3 tempVertex;
-				tempVertex.x = GetFloatToken();
-				tempVertex.y = GetFloatToken();
-				tempVertex.z = GetFloatToken();
-
-				//　頂点データを追加
-				tempMesh.AddVertex(tempVertex);
+				mesh->vertex[i].x = GetFloatToken();
+				mesh->vertex[i].y = GetFloatToken();
+				mesh->vertex[i].z = GetFloatToken();
 			}
-
-			//　頂点数をチェック
-			if (tempMesh.numVertices != vertCount)
-			{
-				cout << "Error : 頂点数が一致していません\n";
-				return false;
-			}
-
-			//　面数のカウンターを0に戻す
-			faceCount = 0;
 
 			//　トークンから面数を取得
-			faceCount = GetIntToken();
+			mesh->numFaces = GetIntToken();
 
 			//　メモリを確保
-			tempFace = new XFace[faceCount];
+			mesh->face = new XFace[mesh->numFaces];
 
 			//　トークンから面データを取得
-			for (int i = 0; i<faceCount; i++)
+			for (int i = 0; i<mesh->numFaces; i++)
 			{
-				int tempIndex[4] = { -1, -1, -1, -1 };
-				tempFace[i].element = 0;
-				tempFace[i].indexMaterial = -1;
+				mesh->face[i].element = 0;
+				mesh->face[i].indexMaterial = -1;
 
 				//　トークンを取得
 				GetToken();
@@ -802,41 +642,34 @@ bool XModel::Load(char *filename, float scale)
 				if (CheckToken("3"))
 				{
 					//　要素数は3にする
-					tempFace[i].element = 3;
+					mesh->face[i].element = 3;
 
 					//　トークンから頂点インデックスを取得
 					for (int j = 0; j<3; j++)
 					{
-						tempIndex[j] = GetIntToken();
+						int index = GetIntToken();
+						mesh->face[i].indexVertices[j] = index;
+						mesh->face[i].indexTexCoords[j] = index;
 					}
 
 					//　4番目のインデックスには-1を格納
-					tempIndex[3] = -1;
-
-					//　頂点インデックスをセット
-					tempFace[i].SetVertexIndex(tempIndex);
-
-					//　テクスチャ座標インデックスをセット
-					tempFace[i].SetTexCoordIndex(tempIndex);
+					mesh->face[i].indexVertices[3] = -1;
+					mesh->face[i].indexTexCoords[3] = -1;
 				}
 
 				//　四角形の場合
 				else if (CheckToken("4"))
 				{
 					//　要素数は4にする
-					tempFace[i].element = 4;
+					mesh->face[i].element = 4;
 
 					//　トークンから頂点インデックスを取得
 					for (int j = 0; j<4; j++)
 					{
-						tempIndex[j] = GetIntToken();
+						int index = GetIntToken();
+						mesh->face[i].indexVertices[j] = index;
+						mesh->face[i].indexTexCoords[j] = index;
 					}
-
-					//　頂点インデックスをセット
-					tempFace[i].SetVertexIndex(tempIndex);
-
-					//　テクスチャ座標インデックスをセット
-					tempFace[i].SetTexCoordIndex(tempIndex);
 				}
 			}
 		}
@@ -847,42 +680,28 @@ bool XModel::Load(char *filename, float scale)
 			//　トークンを取得
 			GetToken("{");
 
-			//　法線数のカウンターを0に戻す
-			normCount = 0;
-
 			//　トークンから法線数を取得
-			normCount = GetIntToken();
+			mesh->numNormals = GetIntToken();
+
+			mesh->normal = new glm::vec3[mesh->numNormals];
 
 			//　トークンから法線データを取得
-			for (int i = 0; i<normCount; i++)
+			for (int i = 0; i<mesh->numNormals; i++)
 			{
-				glm::vec3 tempNormal;
-				tempNormal.x = GetFloatToken();
-				tempNormal.y = GetFloatToken();
-				tempNormal.z = GetFloatToken();
-
-				//　法線データを追加
-				tempMesh.AddNormal(tempNormal);
-			}
-
-			//　法線数をチェック
-			if (tempMesh.numNormals != normCount)
-			{
-				cout << "Error : 法線数が一致していません\n";
-				return false;
+				mesh->normal[i].x = GetFloatToken();
+				mesh->normal[i].y = GetFloatToken();
+				mesh->normal[i].z = GetFloatToken();
 			}
 
 			//　法線インデックス数をチェック
-			if (GetIntToken() != faceCount)
+			if (GetIntToken() != mesh->numFaces)
 			{
 				cout << "Error : 面数と法線インデックス数が一致していません\n";
 				return false;
 			}
 
-			for (int i = 0; i<faceCount; i++)
+			for (int i = 0; i<mesh->numFaces; i++)
 			{
-				int tempIndex[4] = { -1, -1, -1, -1 };
-
 				//　トークンを取得
 				GetToken();
 
@@ -892,14 +711,11 @@ bool XModel::Load(char *filename, float scale)
 					//　トークンから法線インデックスを取得
 					for (int j = 0; j<3; j++)
 					{
-						tempIndex[j] = GetIntToken();
+						mesh->face[i].indexNormals[j] = GetIntToken();
 					}
 
 					//　4番目のインデックスには-1をセット
-					tempIndex[3] = -1;
-
-					//　法線インデックスをセット
-					tempFace[i].SetNormalIndex(tempIndex);
+					mesh->face[i].indexNormals[3] = -1;
 				}
 
 				//　四角形の場合
@@ -908,11 +724,8 @@ bool XModel::Load(char *filename, float scale)
 					//　法線インデックスを取得
 					for (int j = 0; j<4; j++)
 					{
-						tempIndex[j] = GetIntToken();
+						mesh->face[i].indexNormals[j] = GetIntToken();
 					}
-
-					//　法線インデックスをセット
-					tempFace[i].SetNormalIndex(tempIndex);
 				}
 			}
 		}
@@ -923,21 +736,15 @@ bool XModel::Load(char *filename, float scale)
 			//　トークンを取得
 			GetToken("{");
 
-			//　テクスチャ座標数のカウンターを0に戻す
-			uvCount = 0;
-
 			//　トークンからテクスチャ座標数を取得
-			uvCount = GetIntToken();
+			mesh->numTexCoords = GetIntToken();
 
-			for (int i = 0; i<uvCount; i++)
+			mesh->texcoord = new glm::vec2[mesh->numTexCoords];
+
+			for (int i = 0; i<mesh->numTexCoords; i++)
 			{
-				//　トークンからテクスチャ座標データを取得
-				glm::vec2 tempUV;
-				tempUV.x = GetFloatToken();
-				tempUV.y = GetFloatToken();
-
-				//　テクスチャ座標データを追加
-				tempMesh.AddTexCoord(tempUV);
+				mesh->texcoord[i].x = GetFloatToken();
+				mesh->texcoord[i].y = GetFloatToken();
 			}
 		}
 
@@ -954,16 +761,16 @@ bool XModel::Load(char *filename, float scale)
 			matCount = GetIntToken();
 
 			//　マテリアル数をチェック
-			if (GetIntToken() != faceCount)
+			if (GetIntToken() != mesh->numFaces)
 			{
 				cout << "Error : 面数とマテリアルリスト数が一致しません\n";
 				return false;
 			}
 
 			//　トークンからマテリアルインデックスを取得
-			for (int i = 0; i<faceCount; i++)
+			for (int i = 0; i<mesh->numFaces; i++)
 			{
-				tempFace[i].indexMaterial = GetIntToken();
+				mesh->face[i].indexMaterial = GetIntToken();
 			}
 
 			for (int i = 0; i<matCount; i++)
@@ -1164,34 +971,25 @@ bool XModel::Load(char *filename, float scale)
 		}
 	}
 
-	//　メッシュ数が1以上の場合
-	if (meshCount >= 1)
+	if (mesh != nullptr)
 	{
-		//　面データを追加
-		for (int i = 0; i<faceCount; i++)
-			tempMesh.AddFace(tempFace[i]);
-
 		//　メッシュデータを追加
-		AddMesh(tempMesh);
-
-		//　確保したメモリを解放
-		if (tempFace)
-		{
-			delete[] tempFace;
-			tempFace = NULL;
-		}
+		meshList.push_back(mesh);
+		mesh = nullptr;
 	}
+	numMeshes = meshList.size();
+
 	if (buffer)
 	{
 		delete[] buffer;
-		buffer = NULL;
+		buffer = nullptr;
 	}
 
 	//　バウンディングスフィアを計算
-	ComputeBoundingSphere();
+	ComputeBoundingSphere(meshList);
 
 	//　バウンディングボックスを計算
-	ComputeBoundingBox();
+	ComputeBoundingBox(meshList);
 
 	//  ここから魔改造
 	int i, j, k;
@@ -1225,7 +1023,7 @@ bool XModel::Load(char *filename, float scale)
 
 	for (i = 0; i<numMeshes; i++)
 	{
-		if (mesh[i].numVertices < mesh[i].numTexCoords)
+		if (meshList[i]->numVertices < meshList[i]->numTexCoords)
 		{
 			cout << "未対応" << endl;
 			getchar();
@@ -1235,59 +1033,59 @@ bool XModel::Load(char *filename, float scale)
 		matList[i] = new MaterialList[numMaterials * 2];
 
 		int indexCount = 0;
-		for (j = 0; j<mesh[i].numFaces; j++)
-			indexCount += mesh[i].face[j].element;
+		for (j = 0; j<meshList[i]->numFaces; j++)
+			indexCount += meshList[i]->face[j].element;
 
 		float* vertexArr;
 		float* normalArr;
 		float* texcoordArr;
 		uint* indexArr;
-		vertexArr = new float[mesh[i].numVertices * 3];
-		normalArr = new float[mesh[i].numVertices * 3];
-		texcoordArr = new float[mesh[i].numVertices * 2];
+		vertexArr = new float[meshList[i]->numVertices * 3];
+		normalArr = new float[meshList[i]->numVertices * 3];
+		texcoordArr = new float[meshList[i]->numVertices * 2];
 		indexArr = new uint[indexCount];
 
-		for (j = 0; j<mesh[i].numVertices; j++)
+		for (j = 0; j<meshList[i]->numVertices; j++)
 		{
-			vertexArr[j * 3 + 0] = mesh[i].vertex[j].x*scale;
-			vertexArr[j * 3 + 1] = mesh[i].vertex[j].y*scale;
-			vertexArr[j * 3 + 2] = mesh[i].vertex[j].z*scale;
+			vertexArr[j * 3 + 0] = meshList[i]->vertex[j].x*scale;
+			vertexArr[j * 3 + 1] = meshList[i]->vertex[j].y*scale;
+			vertexArr[j * 3 + 2] = meshList[i]->vertex[j].z*scale;
 		}
-		if (mesh[i].numTexCoords == mesh[i].numVertices)
+		if (meshList[i]->numTexCoords == meshList[i]->numVertices)
 		{
-			for (j = 0; j<mesh[i].numVertices; j++)
+			for (j = 0; j<meshList[i]->numVertices; j++)
 			{
-				texcoordArr[j * 2 + 0] = mesh[i].texcoord[j].x;
-				texcoordArr[j * 2 + 1] = mesh[i].texcoord[j].y;
+				texcoordArr[j * 2 + 0] = meshList[i]->texcoord[j].x;
+				texcoordArr[j * 2 + 1] = meshList[i]->texcoord[j].y;
 			}
 		}
 		else
 		{
-			for (j = 0; j<mesh[i].numFaces; j++)
-				for (k = 0; k<mesh[i].face[j].element; k++)
+			for (j = 0; j<meshList[i]->numFaces; j++)
+				for (k = 0; k<meshList[i]->face[j].element; k++)
 				{
-					texcoordArr[mesh[i].face[j].indexVertices[k] * 2 + 0] = mesh[i].texcoord[mesh[i].face[j].indexTexCoords[k]].x;
-					texcoordArr[mesh[i].face[j].indexVertices[k] * 2 + 1] = mesh[i].texcoord[mesh[i].face[j].indexTexCoords[k]].y;
+					texcoordArr[meshList[i]->face[j].indexVertices[k] * 2 + 0] = meshList[i]->texcoord[meshList[i]->face[j].indexTexCoords[k]].x;
+					texcoordArr[meshList[i]->face[j].indexVertices[k] * 2 + 1] = meshList[i]->texcoord[meshList[i]->face[j].indexTexCoords[k]].y;
 				}
 		}
-		if (mesh[i].numVertices == mesh[i].numNormals)
+		if (meshList[i]->numVertices == meshList[i]->numNormals)
 		{
-			for (j = 0; j<mesh[i].numVertices; j++)
+			for (j = 0; j<meshList[i]->numVertices; j++)
 			{
-				normalArr[j * 3 + 0] = mesh[i].normal[j].x;
-				normalArr[j * 3 + 1] = mesh[i].normal[j].y;
-				normalArr[j * 3 + 2] = mesh[i].normal[j].z;
+				normalArr[j * 3 + 0] = meshList[i]->normal[j].x;
+				normalArr[j * 3 + 1] = meshList[i]->normal[j].y;
+				normalArr[j * 3 + 2] = meshList[i]->normal[j].z;
 			}
 		}
 		else
 		{
 			// 頂点に合うように法線データを作成
-			for (j = 0; j<mesh[i].numFaces; j++)
-				for (k = 0; k<mesh[i].face[j].element; k++)
+			for (j = 0; j<meshList[i]->numFaces; j++)
+				for (k = 0; k<meshList[i]->face[j].element; k++)
 				{
-					normalArr[mesh[i].face[j].indexVertices[k] * 3 + 0] = mesh[i].normal[mesh[i].face[j].indexNormals[k]].x;
-					normalArr[mesh[i].face[j].indexVertices[k] * 3 + 1] = mesh[i].normal[mesh[i].face[j].indexNormals[k]].y;
-					normalArr[mesh[i].face[j].indexVertices[k] * 3 + 2] = mesh[i].normal[mesh[i].face[j].indexNormals[k]].z;
+					normalArr[meshList[i]->face[j].indexVertices[k] * 3 + 0] = meshList[i]->normal[meshList[i]->face[j].indexNormals[k]].x;
+					normalArr[meshList[i]->face[j].indexVertices[k] * 3 + 1] = meshList[i]->normal[meshList[i]->face[j].indexNormals[k]].y;
+					normalArr[meshList[i]->face[j].indexVertices[k] * 3 + 2] = meshList[i]->normal[meshList[i]->face[j].indexNormals[k]].z;
 				}
 		}
 
@@ -1295,14 +1093,14 @@ bool XModel::Load(char *filename, float scale)
 		for (j = 0; j<numMaterials; j++)
 		{
 			int faceNum = 0;
-			for (k = 0; k<mesh[i].numFaces; k++)
+			for (k = 0; k<meshList[i]->numFaces; k++)
 			{
-				if (mesh[i].face[k].element == 3 &&
-					mesh[i].face[k].indexMaterial == j)
+				if (meshList[i]->face[k].element == 3 &&
+					meshList[i]->face[k].indexMaterial == j)
 				{
-					indexArr[index + 0] = mesh[i].face[k].indexVertices[0];
-					indexArr[index + 1] = mesh[i].face[k].indexVertices[1];
-					indexArr[index + 2] = mesh[i].face[k].indexVertices[2];
+					indexArr[index + 0] = meshList[i]->face[k].indexVertices[0];
+					indexArr[index + 1] = meshList[i]->face[k].indexVertices[1];
+					indexArr[index + 2] = meshList[i]->face[k].indexVertices[2];
 					index += 3;
 					faceNum++;
 				}
@@ -1312,15 +1110,15 @@ bool XModel::Load(char *filename, float scale)
 			matList[i][j * 2].materialIndex = j;
 
 			faceNum = 0;
-			for (k = 0; k<mesh[i].numFaces; k++)
+			for (k = 0; k<meshList[i]->numFaces; k++)
 			{
-				if (mesh[i].face[k].element == 4 &&
-					mesh[i].face[k].indexMaterial == j)
+				if (meshList[i]->face[k].element == 4 &&
+					meshList[i]->face[k].indexMaterial == j)
 				{
-					indexArr[index + 0] = mesh[i].face[k].indexVertices[0];
-					indexArr[index + 1] = mesh[i].face[k].indexVertices[1];
-					indexArr[index + 2] = mesh[i].face[k].indexVertices[2];
-					indexArr[index + 3] = mesh[i].face[k].indexVertices[3];
+					indexArr[index + 0] = meshList[i]->face[k].indexVertices[0];
+					indexArr[index + 1] = meshList[i]->face[k].indexVertices[1];
+					indexArr[index + 2] = meshList[i]->face[k].indexVertices[2];
+					indexArr[index + 3] = meshList[i]->face[k].indexVertices[3];
 					index += 4;
 					faceNum++;
 				}
@@ -1334,9 +1132,9 @@ bool XModel::Load(char *filename, float scale)
 
 		glGenBuffers(4, &vbo[i * 4 + 0]);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo[i * 4 + 0]);
-		glBufferData(GL_ARRAY_BUFFER, mesh[i].numVertices * 3 * sizeof(float), vertexArr, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, meshList[i]->numVertices * 3 * sizeof(float), vertexArr, GL_STATIC_DRAW);
 		glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
-		if (mesh[i].numVertices * 3 * sizeof(float) != bufferSize)
+		if (meshList[i]->numVertices * 3 * sizeof(float) != bufferSize)
 		{
 			glDeleteBuffers(1, &vbo[i * 4 + 0]);
 			cout << "Model Error : VBOの作成に失敗しました。" << endl;
@@ -1345,9 +1143,9 @@ bool XModel::Load(char *filename, float scale)
 		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo[i * 4 + 1]);
-		glBufferData(GL_ARRAY_BUFFER, mesh[i].numVertices * 3 * sizeof(float), normalArr, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, meshList[i]->numVertices * 3 * sizeof(float), normalArr, GL_STATIC_DRAW);
 		glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
-		if (mesh[i].numVertices * 3 * sizeof(float) != bufferSize)
+		if (meshList[i]->numVertices * 3 * sizeof(float) != bufferSize)
 		{
 			glDeleteBuffers(2, &vbo[i * 4 + 0]);
 			cout << "Model Error : VBOの作成に失敗しました。" << endl;
@@ -1356,9 +1154,9 @@ bool XModel::Load(char *filename, float scale)
 		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo[i * 4 + 2]);
-		glBufferData(GL_ARRAY_BUFFER, mesh[i].numVertices * 2 * sizeof(float), texcoordArr, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, meshList[i]->numVertices * 2 * sizeof(float), texcoordArr, GL_STATIC_DRAW);
 		glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
-		if (mesh[i].numVertices * 2 * sizeof(float) != bufferSize)
+		if (meshList[i]->numVertices * 2 * sizeof(float) != bufferSize)
 		{
 			glDeleteBuffers(3, &vbo[i * 4 + 0]);
 			cout << "Model Error : VBOの作成に失敗しました。" << endl;
@@ -1385,10 +1183,17 @@ bool XModel::Load(char *filename, float scale)
 		delete[] texcoordArr;
 		delete[] indexArr;
 	}
-	if (mesh)
+	if (meshList.size() > 0)
 	{
-		delete[] mesh;
-		mesh = NULL;
+		for (auto mesh : meshList)
+		{
+			delete[] mesh->face;
+			delete[] mesh->vertex;
+			delete[] mesh->normal;
+			delete[] mesh->texcoord;
+			delete mesh;
+		}
+		meshList.clear();
 	}
 	delete[] dirName;
 

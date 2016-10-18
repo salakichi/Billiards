@@ -7,6 +7,9 @@
 // ・ロード時のバグ修正
 // ・VBOでレンダリング
 // ・様々な画像形式のサポート
+//
+// 諸注意
+// 一部効率悪いことしているので要改良
 
 
 #include <iostream>
@@ -75,14 +78,10 @@ class XFace
 public:
 	int element;
 	int indexMaterial;
-	int indexVertices[4];
-	int indexNormals[4];
-	int indexTexCoords[4];
-	XFace &operator = (XFace &ob);
+	glm::uvec4 indexVertices;
+	glm::uvec4 indexNormals;
+	glm::uvec4 indexTexCoords;
 	XFace();
-	void SetVertexIndex(int index[]);
-	void SetNormalIndex(int index[]);
-	void SetTexCoordIndex(int index[]);
 };
 
 //
@@ -122,12 +121,7 @@ public:
 	glm::vec3* normal;
 	glm::vec2* texcoord;
 	XFace* face;
-	XMesh &operator = (XMesh &ob);
 	XMesh();
-	int AddVertex(glm::vec3 &ob);
-	int AddNormal(glm::vec3 &ob);
-	int AddTexCoord(glm::vec2 &ob);
-	int AddFace(XFace &ob);
 	void Release();
 	void SetName(char *str);
 };
@@ -154,18 +148,16 @@ struct MaterialList
 class XModel
 {
 private:
-	void ComputeBoundingSphere();
-	void ComputeBoundingBox();
+	void ComputeBoundingSphere(vector<XMesh*> meshList);
+	void ComputeBoundingBox(vector<XMesh*> meshList);
 	int numMeshes;
 	int numMaterials;
-	XMesh *mesh;
 	list<XMaterial> material;
 
 	MaterialStruct* matArr;
 	MaterialList** matList;
 	GLuint* vbo;
 
-	int AddMesh(XMesh ob);
 	int AddMaterial(XMaterial ob);
 	void ChangeMaterialIndex(XMaterial ob, int index);
 	void DeleteMaterial(XMaterial ob);
