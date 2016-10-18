@@ -11,12 +11,11 @@
 class Font
 {
 private:
-	vector<string> fileList;
+	FTPixmapFont* data;
 	void ErrorLog(char* msg);
-	bool isLoaded(const char* fileName);
 public:
-	map<string, FTPixmapFont*> list;
-	bool Load(const char* fileName, const char* fontName, int fontSize = DEFAULT_FONT_SIZE);
+	bool Load(const char* fileName, int fontSize = DEFAULT_FONT_SIZE);
 	void Release();
-	void SetSize(string name, int size);
+	void SetSize(int size);
+	void Render(wchar_t* text);
 };

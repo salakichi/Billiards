@@ -34,19 +34,19 @@ void Ball::TestCollisionWall()
 	if (zHitFlag) velocity.z *= -1.f;
 	if (xHitFlag || zHitFlag) rotVelocity = glm::cross(glm::vec3(0.f, 1.f, 0.f), velocity) * glm::length(velocity) * 12.f;
 }
-void Ball::TestCollisionBall(Ball& ball)
+void Ball::TestCollisionBall(Ball* ball)
 {
-	float old_distance = glm::distance(model.position - velocity, ball.model.position);
-	float distance = glm::distance(model.position, ball.model.position);
+	float old_distance = glm::distance(model.position - velocity, ball->model.position);
+	float distance = glm::distance(model.position, ball->model.position);
 	// ‹ß‚Ã‚¢‚ÄÚG‚µ‚½‚ç
-	if (old_distance > distance && distance < model.sphere.radius + ball.model.sphere.radius)
+	if (old_distance > distance && distance < model.sphere.radius + ball->model.sphere.radius)
 	{
-		glm::vec3 vec = glm::normalize(ball.model.position - model.position);
-		glm::vec3 gap = glm::dot(velocity, vec)*vec - glm::dot(ball.velocity, -vec)*(-vec);
+		glm::vec3 vec = glm::normalize(ball->model.position - model.position);
+		glm::vec3 gap = glm::dot(velocity, vec)*vec - glm::dot(ball->velocity, -vec)*(-vec);
 		if (glm::length(gap) > FLT_EPSILON)
 		{
 			velocity -= gap;
-			ball.AddVec(gap);
+			ball->AddVec(gap);
 		}
 	}
 }

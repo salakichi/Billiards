@@ -6,51 +6,35 @@ void Font::ErrorLog(char* msg)
 	cout << "Font Error : " << msg << endl;
 }
 
-bool Font::isLoaded(const char* fileName)
-{
-	bool loadedFlag = false;
-	for (int i = 0; i < fileList.size(); ++i)
-	{
-		if (fileList[i] == fileName) {
-			loadedFlag = true;
-			break;
-		}
-	}
-	return loadedFlag;
-}
 
-bool Font::Load(const char* fileName, const char* fontName, int fontSize)
+bool Font::Load(const char* fileName,  int fontSize)
 {
 	
-	if (!isLoaded(fileName))
+	data = new FTPixmapFont(fileName);
+	if (data->Error())
 	{
-		FTPixmapFont* newFont = new FTPixmapFont(fileName);
-		if (newFont->Error())
-		{
-			delete newFont;
-			ErrorLog("failed to load font file");
-			return false;
-		}
-		else
-		{
-			newFont->FaceSize(fontSize);
-			fileList.push_back(fileName);
-			list.insert(map<string, FTPixmapFont*>::value_type(fontName, newFont));
-		}
+		delete data;
+		ErrorLog("failed to load font file");
+		return false;
+	}
+	else
+	{
+		data->FaceSize(fontSize);
 	}
 	return true;
 }
 
 void Font::Release()
 {
-	for_each(list.begin(), list.end(), [](pair<string, FTPixmapFont*> elm) {
-		delete elm.second;
-	});
-	list.clear();
-	fileList.clear();
+	delete data;
 }
 
-void Font::SetSize(string name, int size)
+void Font::SetSize(int size)
 {
-	list[name]->FaceSize(size);
+	data->FaceSize(size);
+}
+
+void Font::Render(wchar_t* text)
+{
+	data->Render(text);
 }

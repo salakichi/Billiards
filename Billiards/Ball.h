@@ -26,7 +26,7 @@ public:
 	void AddVec(glm::vec3 addVel);
 	void Move();
 	void TestCollisionWall();
-	void TestCollisionBall(Ball& ball);
+	void TestCollisionBall(Ball* ball);
 	void UpdateVelocity();
 	void TestPocket();
 };
