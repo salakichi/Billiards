@@ -3,6 +3,21 @@
 
 bool loadFinishFlag = false;
 
+char* fontFileList[] = {
+	FONT_BOKU,
+	FONT_MISAKI
+};
+
+char* soundFileList[] = {
+	BGM_TITLE,
+	BGM_MAIN,
+	SE_START,
+	SE_CLICK,
+	SE_SHOT,
+	SE_BALL,
+	SE_POCKET
+};
+
 ResourceManager::ResourceManager()
 {
 	// スレッド関連の初期化
@@ -88,41 +103,40 @@ bool ResourceManager::Load()
 
 		//　モデルファイルの読み込み
 		XModel* tableModel = new XModel();
-		loadResult = tableModel->Load(TABLE_MODEL);
-		if (!loadResult) throw TABLE_MODEL;
-		modelList.insert(map<string, XModel*>::value_type(TABLE_MODEL, tableModel));
+		loadResult = tableModel->Load(MODEL_TABLE);
+		if (!loadResult) throw MODEL_TABLE;
+		modelList.insert(map<string, XModel*>::value_type(MODEL_TABLE, tableModel));
 
 		XModel* stageModel = new XModel();
-		loadResult = stageModel->Load(STAGE_MODEL, 20.f);
-		if (!loadResult) throw STAGE_MODEL;
-		modelList.insert(map<string, XModel*>::value_type(STAGE_MODEL, stageModel));
+		loadResult = stageModel->Load(MODEL_STAGE, 20.f);
+		if (!loadResult) throw MODEL_STAGE;
+		modelList.insert(map<string, XModel*>::value_type(MODEL_STAGE, stageModel));
 
 		char ballFilename[256];
 		for (int i = 0; i <= 15; ++i)
 		{
 			Ball* ball = new Ball();
-			sprintf_s(ballFilename, BALL_MODEL, i);
+			sprintf_s(ballFilename, MODEL_BALL, i);
 			loadResult = ball->model.Load(ballFilename);
 			if (!loadResult) throw ballFilename;
 			balls[i] = ball;
 		}
 
 		// フォントファイルの読み込み
-		Font* misakiFont = new Font();
-		loadResult = misakiFont->Load(MISAKI_FONT, 32);
-		if (!loadResult) throw MISAKI_FONT;
-		fontList.insert(map<string, Font*>::value_type(MISAKI_FONT, misakiFont));
-
-		Font* bokuFont = new Font();
-		loadResult = bokuFont->Load(BOKU_FONT, 32);
-		if (!loadResult) throw BOKU_FONT;
-		fontList.insert(map<string, Font*>::value_type(BOKU_FONT, bokuFont));
+		for (int i = 0, len = sizeof(fontFileList) / sizeof(char*); i < len; ++i) {
+			Font* font = new Font();
+			loadResult = font->Load(fontFileList[i], 32);
+			if (!loadResult) throw fontFileList[i];
+			fontList.insert(map<string, Font*>::value_type(fontFileList[i], font));
+		}
 
 		// BGMの読み込み
-		Sound* titleBgm = new Sound();
-		loadResult = titleBgm->LoadWave(TITLE_BGM, 0.25f, true);
-		if (!loadResult) throw TITLE_BGM;
-		soundList.insert(map<string, Sound*>::value_type(TITLE_BGM, titleBgm));
+		for (int i = 0, len = sizeof(soundFileList) / sizeof(char*); i < len; ++i) {
+			Sound* sound = new Sound();
+			loadResult = sound->LoadWave(soundFileList[i], 0.25f, true);
+			if (!loadResult) throw soundFileList[i];
+			soundList.insert(map<string, Sound*>::value_type(soundFileList[i], sound));
+		}
 
 		// ローディング終了
 		CloseLoadScreen();

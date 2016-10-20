@@ -3,7 +3,7 @@
 
 TitleScene::TitleScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 {
-	XModel* tableModel = RModel(TABLE_MODEL);
+	XModel* tableModel = RModel(MODEL_TABLE);
 
 	// ƒe[ƒuƒ‹‚Ìã‚ðŠî€‚Æ‚·‚é
 	glm::vec3 globalPos = glm::vec3(0.f, -tableModel->box.max.y + 0.3f, 0.f);
@@ -37,7 +37,7 @@ TitleScene::TitleScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 	}
 
 	// BGM‚ð—¬‚·
-	RSound(TITLE_BGM)->Play();
+	RSound(BGM_TITLE)->Play();
 }
 
 TitleScene::~TitleScene()
@@ -47,7 +47,7 @@ TitleScene::~TitleScene()
 void TitleScene::Finish()
 {
 	// BGM‚ðSTOP
-	RSound(TITLE_BGM)->Stop();
+	RSound(BGM_TITLE)->Stop();
 }
 
 void TitleScene::SetCamera()
@@ -88,27 +88,27 @@ void TitleScene::Render2D()
 
 	// FPS‚Ì•`‰æ
 	glColor4f(1.f, 1.f, 1.f, 1.f);
-	drawText(FpsString, BOKU_FONT, glm::uvec2(20, 40), glm::vec2());
+	drawText(FpsString, FONT_BOKU, glm::uvec2(20, 40), glm::vec2());
 
-	drawText("OpenGL Billiards", MISAKI_FONT, glm::uvec2(windowSize.x / 2 - 120, windowSize.y / 4), glm::vec2());
+	drawText("OpenGL Billiards", FONT_MISAKI, glm::uvec2(windowSize.x / 2 - 120, windowSize.y / 4), glm::vec2());
 
 	glColor4f(1.f, 1.f, 1.f, (float)rate);
-	drawText("Press Enter", MISAKI_FONT, glm::uvec2(windowSize.x / 2 - 80, windowSize.y * 3 / 4), glm::vec2());
+	drawText("Press Enter", FONT_MISAKI, glm::uvec2(windowSize.x / 2 - 80, windowSize.y * 3 / 4), glm::vec2());
 }
 
 void TitleScene::Render3D()
 {
-	for (int i = 0; i <= 16; ++i)
+	for (int i = 0; i <= 15; ++i)
 	{
 		RBall(i)->model.Render();
 	}
-	RModel(TABLE_MODEL)->Render();
-	RModel(STAGE_MODEL)->Render();
+	RModel(MODEL_TABLE)->Render();
+	RModel(MODEL_STAGE)->Render();
 }
 
 void TitleScene::Update()
 {
-	for (int i = 0; i < 16; ++i)
+	for (int i = 0; i < 15; ++i)
 	{
 		Ball* ball = RBall(i);
 		ball->Move();
@@ -130,10 +130,10 @@ void TitleScene::Keyboard(KEY key)
 	switch (key)
 	{
 	case KEY_UP:
-		RSound(TITLE_BGM)->AddGain(0.05f);
+		RSound(BGM_TITLE)->AddGain(0.05f);
 		break;
 	case KEY_DOWN:
-		RSound(TITLE_BGM)->AddGain(-0.05f);
+		RSound(BGM_TITLE)->AddGain(-0.05f);
 		break;
 	case KEY_ENTER:
 		Next(MAIN);

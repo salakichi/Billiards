@@ -122,46 +122,6 @@ static void SkipNode()
 	}
 }
 
-static int substring(char *src, char* dest, const char *str1, const char *str2)
-{
-	char *from, *to;
-	size_t len;
-
-	if ((from = strstr(src, str1)) == NULL)
-		return 0;
-	if ((to = strstr(from, str2)) == NULL)
-		return 0;
-	len = strlen(from) - strlen(to) + strlen(str2);
-	strncpy_s(dest, 1024, from, len);
-	dest[len] = '\0';
-
-	return 1;
-}
-
-static void strdelete(char *buf, const char *str1)
-{
-	char *p;
-	size_t strLen, bufLen;
-
-	strLen = strlen(str1);
-	while ((p = strstr(buf, str1)) != NULL) {
-		bufLen = strlen(p);
-		for (int i = 0; i<bufLen - strLen; i++) {
-			*(p + i) = *(p + i + strLen);
-		}
-		*(p + bufLen - strLen) = '\0';
-	}
-}
-
-static void CommentDelete(char* buf)
-{
-	char str[1024];
-
-	while ((substring(buf, str, "//", "\n")) != NULL) {
-		strdelete(buf, str);
-	}
-}
-
 ////////////////////////////////////////////////////////////////////////
 // XFace class
 ////////////////////////////////////////////////////////////////////////
@@ -410,7 +370,7 @@ void XModel::Release()
 // Name : ComputeBoundingSphere()
 // Desc : バウンディングスフィアを計算する
 //--------------------------------------------------------------------------------------------------
-void XModel::ComputeBoundingSphere(vector<XMesh*> meshList)
+void XModel::ComputeBoundingSphere(vector<XMesh*> &meshList, float scale)
 {
 	int count = 0;
 	float tempRadius = 0.0f;
@@ -450,15 +410,15 @@ void XModel::ComputeBoundingSphere(vector<XMesh*> meshList)
 	}
 
 	//　結果を格納
-	sphere.center = tempCenter;
-	sphere.radius = tempRadius;
+	sphere.center = tempCenter * scale;
+	sphere.radius = tempRadius * scale;
 }
 
 //--------------------------------------------------------------------------------------------------
 // Name : ComputeBoundingBox()
 // Desc : バウンディングボックスを計算する
 //--------------------------------------------------------------------------------------------------
-void XModel::ComputeBoundingBox(vector<XMesh*> meshList)
+void XModel::ComputeBoundingBox(vector<XMesh*> &meshList, float scale)
 {
 	glm::vec3 tempMin = glm::vec3();
 	glm::vec3 tempMax = glm::vec3();
@@ -488,8 +448,8 @@ void XModel::ComputeBoundingBox(vector<XMesh*> meshList)
 	}
 
 	//　結果を格納
-	box.min = tempMin;
-	box.max = tempMax;
+	box.min = tempMin * scale;
+	box.max = tempMax * scale;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -542,7 +502,7 @@ bool XModel::Load(char *filename, float scale)
 	buffer[fileSize] = '\0';
 
 	//　バッファに格納
-	size_t read_size = fread_s(buffer, fileSize, fileSize, 1, fp);
+	size_t read_size = fread_s(buffer, fileSize+1, fileSize, 1, fp);
 	fclose(fp);
 
 	//　サイズチェック
@@ -551,8 +511,6 @@ bool XModel::Load(char *filename, float scale)
 		cout << "XLoader Error : 読み込みサイズとサイズが一致していません\n";
 		return false;
 	}
-
-	CommentDelete(buffer);
 
 	//　Pointerに読み込んだバッファをセット
 	Pointer = buffer;
@@ -986,10 +944,10 @@ bool XModel::Load(char *filename, float scale)
 	}
 
 	//　バウンディングスフィアを計算
-	ComputeBoundingSphere(meshList);
+	ComputeBoundingSphere(meshList, scale);
 
 	//　バウンディングボックスを計算
-	ComputeBoundingBox(meshList);
+	ComputeBoundingBox(meshList, scale);
 
 	//  ここから魔改造
 	int i, j, k;

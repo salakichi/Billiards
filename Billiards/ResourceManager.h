@@ -17,12 +17,18 @@
 
 // リソースのファイルパス
 // リソースにアクセスする際のキーとしても使用
-#define TABLE_MODEL "data\\model\\table.x"
-#define STAGE_MODEL "data\\room\\松野家居間_ダンス用.x"
-#define BALL_MODEL "data\\model\\%d.x"
-#define MISAKI_FONT "data\\font\\misaki_gothic.ttf"
-#define BOKU_FONT "data\\font\\bokutachi.otf"
-#define TITLE_BGM "data\\sound\\bgm.wav"
+#define MODEL_TABLE "data\\model\\table.x"
+#define MODEL_STAGE "data\\room\\松野家居間_ダンス用.x"
+#define MODEL_BALL "data\\model\\%d.x"
+#define FONT_MISAKI "data\\font\\misaki_gothic.ttf"
+#define FONT_BOKU "data\\font\\bokutachi.otf"
+#define BGM_TITLE "data\\bgm\\title.wav"
+#define BGM_MAIN "data\\bgm\\main.wav"
+#define SE_START "data\\se\\start.wav"
+#define SE_CLICK "data\\se\\click.wav"
+#define SE_SHOT "data\\se\\shot.wav"
+#define SE_BALL "data\\se\\ball.wav"
+#define SE_POCKET "data\\se\\pocket.wav"
 
 class ResourceManager
 {

@@ -3,7 +3,7 @@
 
 MainScene::MainScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 {
-	XModel* tableModel = RModel(TABLE_MODEL);
+	XModel* tableModel = RModel(MODEL_TABLE);
 
 	// テーブルの上を基準とする
 	glm::vec3 globalPos = glm::vec3(0.f, -tableModel->box.max.y + 0.3f, 0.f);
@@ -35,6 +35,9 @@ MainScene::MainScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 			++k;
 		}
 	}
+
+	// BGMを流す
+	RSound(BGM_MAIN)->Play();
 }
 
 MainScene::~MainScene()
@@ -43,6 +46,8 @@ MainScene::~MainScene()
 
 void MainScene::Finish()
 {
+	// BGMをSTOP
+	RSound(BGM_MAIN)->Stop();
 }
 
 void MainScene::SetCamera()
@@ -53,22 +58,22 @@ void MainScene::SetCamera()
 void MainScene::Render2D()
 {
 	//　文字の描画
-	drawText((char *)FpsString, BOKU_FONT, glm::uvec2(20, 40), glm::vec2());
+	drawText((char *)FpsString, FONT_BOKU, glm::uvec2(20, 40), glm::vec2());
 }
 
 void MainScene::Render3D()
 {
-	for (int i = 0; i <= 16; ++i)
+	for (int i = 0; i <= 15; ++i)
 	{
 		RBall(i)->model.Render();
 	}
-	RModel(TABLE_MODEL)->Render();
-	RModel(STAGE_MODEL)->Render();
+	RModel(MODEL_TABLE)->Render();
+	RModel(MODEL_STAGE)->Render();
 }
 
 void MainScene::Update()
 {
-	for (int i = 0; i < 16; ++i)
+	for (int i = 0; i < 15; ++i)
 	{
 		Ball* ball = RBall(i);
 		ball->Move();
@@ -89,6 +94,12 @@ void MainScene::Keyboard(KEY key)
 {
 	switch (key)
 	{
+	case KEY_UP:
+		RSound(BGM_MAIN)->AddGain(0.05f);
+		break;
+	case KEY_DOWN:
+		RSound(BGM_MAIN)->AddGain(-0.05f);
+		break;
 	case KEY_ENTER:
 		RBall(0)->AddVec(glm::vec3(0.25f, 0.f, 0.f));
 		break;

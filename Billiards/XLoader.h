@@ -148,8 +148,8 @@ struct MaterialList
 class XModel
 {
 private:
-	void ComputeBoundingSphere(vector<XMesh*> meshList);
-	void ComputeBoundingBox(vector<XMesh*> meshList);
+	void ComputeBoundingSphere(vector<XMesh*> &meshList, float scale);
+	void ComputeBoundingBox(vector<XMesh*> &meshList, float scale);
 	int numMeshes;
 	int numMaterials;
 	list<XMaterial> material;
