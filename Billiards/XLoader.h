@@ -1,16 +1,6 @@
 #pragma once
 
-// PROJECT ASURAさんのXファイルレンダラーを改良したもの
-// 元ソース： http://asura.iaigiri.com/OpenGL/gl44.html
-//
-// 改良内容
-// ・ロード時のバグ修正
-// ・VBOでレンダリング
-// ・様々な画像形式のサポート
-//
-// 諸注意
-// 一部効率悪いことしているので要改良
-
+// Xファイルのレンダラー
 
 #include <iostream>
 #include <cmath>

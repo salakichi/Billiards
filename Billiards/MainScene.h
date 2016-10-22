@@ -12,6 +12,8 @@ class MainScene : public Scene
 private:
 	// ƒJƒƒ‰
 	ViewCamera camera;
+
+	bool shotFlag;
 public:
 	MainScene(ResourceManager& resource, glm::uvec2 &size);
 	~MainScene();

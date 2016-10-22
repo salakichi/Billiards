@@ -1,6 +1,7 @@
 /*************************************************************************
-　　Mouse.cpp
-  　　
+Mouse.cpp
+
+Original:　　
 	Mouse Function Library
 
 	Version : 1.0
@@ -84,6 +85,13 @@ void MouseButton::ConsoleOut()
 //-------------------------------------------------------------------------------------------------------
 ViewCamera::ViewCamera(double dist)
 {
+	enableLeftX = true;
+	enableLeftY = true;
+	enableRightX = true;
+	enableRightY = true;
+	enableMiddleX = true;
+	enableMiddleY = true;
+
 	distance = dist;
 	Reset();
 }
@@ -105,32 +113,49 @@ void ViewCamera::MouseMotion(int x, int y)
 	//　左ボタンの処理
 	if (left.state == Push)
 	{
-		//　移動量を計算
-		left.current.x = (double)x - left.before.x + left.after.x;
-		left.current.y = (double)y - left.before.y + left.after.y;
+		if (enableLeftX)
+		{
+			left.current.x = (double)x - left.before.x + left.after.x;
+			angle[0] = DegToRad(angle[0] + left.current.x);
+		}
 
-		if (left.current.y >= 360.0) left.current.y -= 360.0;
-		else if (left.current.y < 0.0) left.current.y += 360.0;
+		if (enableLeftY)
+		{
+			left.current.y = (double)y - left.before.y + left.after.y;
 
-		angle[0] = DegToRad(angle[0] + left.current.x);
-		angle[1] = DegToRad(angle[1] + left.current.y);
+			if (left.current.y >= 360.0) left.current.y -= 360.0;
+			else if (left.current.y < 0.0) left.current.y += 360.0;
+
+			angle[1] = DegToRad(angle[1] + left.current.y);
+		}
 	}
 
 	//　右ボタンの処理
 	if (right.state == Push)
 	{
-		right.current.x = (double)x - right.before.x + right.after.x;
-		right.current.y = -(double)y - right.before.y + right.after.y;
+		if (enableRightX)
+		{
+			right.current.x = (double)x - right.before.x + right.after.x;
+		}
+		if (enableRightY)
+		{
+			right.current.y = -(double)y - right.before.y + right.after.y;
+		}
 	}
 
 	//　中ボタンの処理
 	if (middle.state == Push)
 	{
-		//　移動量を計算
-		middle.current.x = (double)x - middle.before.x + middle.after.x;
-		middle.current.y = (double)y - middle.before.y + middle.after.y;
-		translate[0] = middle.current.x * 0.005;
-		translate[1] = -middle.current.y * 0.005;
+		if (enableMiddleX)
+		{
+			middle.current.x = (double)x - middle.before.x + middle.after.x;
+			translate[0] = middle.current.x * 0.005;
+		}
+		if (enableMiddleY)
+		{
+			middle.current.y = (double)y - middle.before.y + middle.after.y;
+			translate[1] = -middle.current.y * 0.005;
+		}
 	}
 }
 

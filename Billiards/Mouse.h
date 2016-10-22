@@ -1,11 +1,12 @@
 /***************************************************************************
 Mouse.h
 
-Mouse Function Library
+Original:
+	Mouse Function Library
 
-Version : 1.0
-Date : Nov. 02, 2007
-Author : Pocol
+	Version : 1.0
+	Date : Nov. 02, 2007
+	Author : Pocol
 ****************************************************************************/
 
 #pragma once
@@ -15,6 +16,7 @@ Author : Pocol
 //
 #include <iostream>
 #include <cmath>
+#include "glm\vec3.hpp"
 #include "MyFreeglut.h"
 using namespace std;
 
@@ -65,17 +67,25 @@ public:
 //////////////////////////////////////////////////////////////////////////
 class ViewCamera
 {
+private:
+	bool enableLeftX;
+	bool enableLeftY;
+	bool enableRightX;
+	bool enableRightY;
+	bool enableMiddleX;
+	bool enableMiddleY;
+
 public:
 	MouseButton right;
 	MouseButton left;
 	MouseButton middle;
 
 	double distance;
-	double angle[3];
-	double position[3];
-	double target[3];
-	double upvector[3];
-	double translate[3];
+	glm::dvec3 angle;
+	glm::dvec3 position;
+	glm::dvec3 target;
+	glm::dvec3 upvector;
+	glm::dvec3 translate;
 
 	ViewCamera(double dist = 45.0);
 	~ViewCamera();
@@ -84,4 +94,27 @@ public:
 	void MouseMotion(int x, int y);
 	void Set();
 	void RenderSubAxis(int w, int h);
+	void SetEnableLeft(bool x, bool y) {
+		enableLeftX = x;
+		enableLeftY = y;
+	}
+	void SetEnableRight(bool x, bool y) {
+		enableRightX = x;
+		enableRightY = y;
+	}
+	void SetEnableMiddle(bool x, bool y) {
+		enableMiddleX = x;
+		enableMiddleY = y;
+	}
+	void SetDistance(double d) {
+		distance = d;
+	}
+	void SetAngleDeg(glm::dvec3 a) {
+		angle[0] = DegToRad(a.x);
+		angle[1] = DegToRad(a.y);
+		angle[2] = DegToRad(a.z);
+	}
+	void SetTarget(glm::dvec3 t) {
+		target = t;
+	}
 };

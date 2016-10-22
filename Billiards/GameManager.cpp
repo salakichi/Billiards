@@ -62,7 +62,7 @@ bool GameManager::InitializeGL(int argc, char** argv)
 	glutInit(&argc, argv);
 	glutInitWindowPosition(WINDOW_DEFAULT_POS_X, WINDOW_DEFAULT_POS_Y);
 	glutInitWindowSize(windowSize.x, windowSize.y);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE | GLUT_MULTISAMPLE);
 	glutCreateWindow("ビリヤード");
 	if (glewInit() != GLEW_OK)
 	{
@@ -88,6 +88,12 @@ bool GameManager::InitializeGL(int argc, char** argv)
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, lightamb);
+
+	// マルチサンプリングを有効にする
+	glEnable(GL_MULTISAMPLE);
+
+	// アルファ値をサンプルの被覆率にする
+	glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE);
 
 #ifdef SHADOW_MAP_ON
 	glActiveTexture(GL_TEXTURE1);

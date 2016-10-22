@@ -10,16 +10,18 @@ void Ball::SetWall(glm::vec3 min, glm::vec3 max)
 void Ball::AddVec(glm::vec3 addVel)
 {
 	velocity += addVel;
-	rotVelocity = glm::cross(glm::vec3(0.f, 1.f, 0.f), velocity) * glm::length(velocity) * 12.f;
 	isMove = true;
 }
+
 void Ball::Move()
 {
 	if (!isMove) return;
 
 	model.position += velocity;
+	rotVelocity = glm::normalize(glm::cross(glm::vec3(0.f, 1.f, 0.f), velocity)) * glm::length(velocity) * 2.f;
 	model.rotation *= glm::rotate(glm::mat4(1.0f), glm::length(rotVelocity), glm::normalize(rotVelocity));
 }
+
 void Ball::TestCollisionWall()
 {
 	glm::vec3 pos = model.position;
@@ -32,7 +34,6 @@ void Ball::TestCollisionWall()
 
 	if (xHitFlag) velocity.x *= -1.f;
 	if (zHitFlag) velocity.z *= -1.f;
-	if (xHitFlag || zHitFlag) rotVelocity = glm::cross(glm::vec3(0.f, 1.f, 0.f), velocity) * glm::length(velocity) * 12.f;
 }
 void Ball::TestCollisionBall(Ball* ball)
 {
@@ -56,9 +57,8 @@ void Ball::UpdateVelocity()
 
 	float dv = 0.6f*9.8f*0.001f;
 	velocity *= (1.f - dv);
-	rotVelocity *= (1.f - model.sphere.radius * 2.f * dv);
 
-	if (glm::length(velocity) < FLT_EPSILON && glm::length(rotVelocity) < FLT_EPSILON)
+	if (glm::length(velocity) < 0.001f)
 	{
 		isMove = false;
 		velocity = glm::vec3(0.0f);

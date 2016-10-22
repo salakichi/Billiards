@@ -8,9 +8,12 @@ char* fontFileList[] = {
 	FONT_MISAKI
 };
 
-char* soundFileList[] = {
+char* bgmFileList[] = {
 	BGM_TITLE,
-	BGM_MAIN,
+	BGM_MAIN
+};
+
+char* seFileList[] = {
 	SE_START,
 	SE_CLICK,
 	SE_SHOT,
@@ -107,6 +110,11 @@ bool ResourceManager::Load()
 		if (!loadResult) throw MODEL_TABLE;
 		modelList.insert(map<string, XModel*>::value_type(MODEL_TABLE, tableModel));
 
+		XModel* cueModel = new XModel();
+		loadResult = cueModel->Load(MODEL_CUE);
+		if (!loadResult) throw MODEL_CUE;
+		modelList.insert(map<string, XModel*>::value_type(MODEL_CUE, cueModel));
+
 		XModel* stageModel = new XModel();
 		loadResult = stageModel->Load(MODEL_STAGE, 20.f);
 		if (!loadResult) throw MODEL_STAGE;
@@ -131,11 +139,19 @@ bool ResourceManager::Load()
 		}
 
 		// BGMの読み込み
-		for (int i = 0, len = sizeof(soundFileList) / sizeof(char*); i < len; ++i) {
+		for (int i = 0, len = sizeof(bgmFileList) / sizeof(char*); i < len; ++i) {
 			Sound* sound = new Sound();
-			loadResult = sound->LoadWave(soundFileList[i], 0.25f, true);
-			if (!loadResult) throw soundFileList[i];
-			soundList.insert(map<string, Sound*>::value_type(soundFileList[i], sound));
+			loadResult = sound->LoadWave(bgmFileList[i], 0.25f, true);
+			if (!loadResult) throw bgmFileList[i];
+			soundList.insert(map<string, Sound*>::value_type(bgmFileList[i], sound));
+		}
+
+		// SEの読み込み
+		for (int i = 0, len = sizeof(seFileList) / sizeof(char*); i < len; ++i) {
+			Sound* sound = new Sound();
+			loadResult = sound->LoadWave(seFileList[i], 0.25f, false);
+			if (!loadResult) throw seFileList[i];
+			soundList.insert(map<string, Sound*>::value_type(seFileList[i], sound));
 		}
 
 		// ローディング終了

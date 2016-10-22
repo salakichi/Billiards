@@ -136,6 +136,7 @@ void TitleScene::Keyboard(KEY key)
 		RSound(BGM_TITLE)->AddGain(-0.05f);
 		break;
 	case KEY_ENTER:
+		RSound(SE_START)->Play();
 		Next(MAIN);
 		break;
 	default:

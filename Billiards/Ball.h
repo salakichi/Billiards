@@ -5,13 +5,13 @@
 class Ball
 {
 private:
-	bool isFall;
-	bool isMove;
 	glm::vec3 wallMin;
 	glm::vec3 wallMax;
 	glm::vec3 rotVelocity;
 
 public:
+	bool isFall;
+	bool isMove;
 	XModel model;
 	glm::vec3 velocity;
 

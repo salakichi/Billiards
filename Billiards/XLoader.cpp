@@ -1193,6 +1193,7 @@ void XModel::RenderMesh(int index)
 	int indexCount = 0;
 	for (i = 0; i<numMaterials * 2; i++)
 	{
+		if (matList[index][i].faceNum == 0) continue;
 		int matIndex = matList[index][i].materialIndex;
 		if (matArr[matIndex].imageTex != -1)
 		{

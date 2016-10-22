@@ -20,6 +20,7 @@
 #define MODEL_TABLE "data\\model\\table.x"
 #define MODEL_STAGE "data\\room\\èºñÏâ∆ãèä‘_É_ÉìÉXóp.x"
 #define MODEL_BALL "data\\model\\%d.x"
+#define MODEL_CUE "data\\model\\cue.x"
 #define FONT_MISAKI "data\\font\\misaki_gothic.ttf"
 #define FONT_BOKU "data\\font\\bokutachi.otf"
 #define BGM_TITLE "data\\bgm\\title.wav"

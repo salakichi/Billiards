@@ -244,6 +244,7 @@ bool Texture::Load(char* path)
 	}
 	// ‚»‚Ì‘¼‚Ìê‡
 	else {
+		// TODO : opencv3‚Å“Ç‚İ‚Ş‚æ‚¤‚É‚·‚éiŒ»ó‚¾‚ÆRGB‚Å“Ç‚İ‚Ü‚ê‚Ä‚µ‚Ü‚¤Hj
 		IplImage* cvImage = cvLoadImage(path);
 		int size = 0;
 

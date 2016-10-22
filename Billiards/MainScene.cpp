@@ -38,6 +38,15 @@ MainScene::MainScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 
 	// BGM‚ð—¬‚·
 	RSound(BGM_MAIN)->Play();
+
+	// ƒJƒƒ‰Ý’è
+	camera.SetEnableLeft(true, false);
+	camera.SetEnableRight(false, false);
+	camera.SetEnableMiddle(false, false);
+	camera.SetDistance(25.0);
+	camera.SetAngleDeg(glm::dvec3(-90.0, 20.0, 0));
+
+	shotFlag = false;
 }
 
 MainScene::~MainScene()
@@ -52,6 +61,7 @@ void MainScene::Finish()
 
 void MainScene::SetCamera()
 {
+	camera.SetTarget(RBall(0)->model.position);
 	camera.Set();
 }
 
@@ -63,35 +73,69 @@ void MainScene::Render2D()
 
 void MainScene::Render3D()
 {
+	// 2•b‚ÌŽüŠú‚É‚·‚é
+	double elapsedTime = CurrentTime - (double)((int)(CurrentTime / 2.0)) * 2.0;
+	double distance = elapsedTime;
+	if (elapsedTime > 1.0)
+	{
+		distance = 2.0 - elapsedTime;
+	}
+
 	for (int i = 0; i <= 15; ++i)
 	{
 		RBall(i)->model.Render();
 	}
 	RModel(MODEL_TABLE)->Render();
 	RModel(MODEL_STAGE)->Render();
+
+	if (!shotFlag)
+	{
+		glm::vec3 pos = RBall(0)->model.position;
+		glPushMatrix();
+		glTranslatef(pos.x, pos.y, pos.z);
+		glRotatef(RadToDeg(camera.angle[0]) + 90, 0.f, 1.f, 0.f);
+		glTranslatef(-9.0f, 0.45f, 0.f);
+		glRotatef(-93.f, 0.f, 0.f, 1.f);
+		glTranslatef(0.f, -distance, 0.f);
+		RModel(MODEL_CUE)->Render();
+		glPopMatrix();
+	}
 }
 
 void MainScene::Update()
 {
-	for (int i = 0; i < 15; ++i)
+	if (shotFlag)
 	{
-		Ball* ball = RBall(i);
-		ball->Move();
-		ball->TestCollisionWall();
-		for (int j = 0; j < 16; ++j)
+		bool isMove = false;
+		for (int i = 0; i <= 15; ++i)
 		{
-			if (i != j)
+			Ball* ball = RBall(i);
+			ball->Move();
+			ball->TestCollisionWall();
+			for (int j = 0; j < 16; ++j)
 			{
-				ball->TestCollisionBall(RBall(j));
+				if (i != j)
+				{
+					ball->TestCollisionBall(RBall(j));
+				}
+			}
+			ball->TestPocket();
+			ball->UpdateVelocity();
+			if (ball->isMove)
+			{
+				isMove = true;
 			}
 		}
-		ball->TestPocket();
-		ball->UpdateVelocity();
+		if (!isMove)
+		{
+			shotFlag = false;
+		}
 	}
 }
 
 void MainScene::Keyboard(KEY key)
 {
+	float speed, angle;
 	switch (key)
 	{
 	case KEY_UP:
@@ -101,7 +145,13 @@ void MainScene::Keyboard(KEY key)
 		RSound(BGM_MAIN)->AddGain(-0.05f);
 		break;
 	case KEY_ENTER:
-		RBall(0)->AddVec(glm::vec3(0.25f, 0.f, 0.f));
+		if (!shotFlag)
+		{
+			speed = 0.25f;
+			angle = (float)camera.angle[0];
+			RBall(0)->AddVec(glm::vec3(speed*-sin(angle), 0.f, speed*-cos(angle)));
+			shotFlag = true;
+		}
 		break;
 	default:
 		break;
