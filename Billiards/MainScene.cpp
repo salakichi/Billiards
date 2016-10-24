@@ -15,7 +15,7 @@ MainScene::MainScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 	}
 
 	// ボール
-	float padding = 2.4f;
+	float padding = 2.3f;
 	glm::vec3 wallMin = glm::vec3(-tableModel->box.max.x + padding, 0.f, -tableModel->box.max.z + padding);
 	glm::vec3 wallMax = glm::vec3(tableModel->box.max.x - padding, 0.f, tableModel->box.max.z - padding);
 	for (int i = 0; i <= 15; ++i)
@@ -24,7 +24,7 @@ MainScene::MainScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 		RBall(i)->model.EnableRotate();
 	}
 
-	RBall(0)->model.position = glm::vec3(0.f, 0.f, 0.f);
+	RBall(0)->model.position = glm::vec3();
 	float r = RBall(0)->model.sphere.radius*2.f;
 	int k = 1;
 	for (int i = 0; i < 5; ++i)
@@ -47,6 +47,7 @@ MainScene::MainScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 	camera.SetAngleDeg(glm::dvec3(-90.0, 20.0, 0));
 
 	shotFlag = false;
+	lastHitTime = 0.0;
 }
 
 MainScene::~MainScene()
@@ -61,14 +62,28 @@ void MainScene::Finish()
 
 void MainScene::SetCamera()
 {
-	camera.SetTarget(RBall(0)->model.position);
+	if (shotFlag)
+	{
+		camera.SetOffset(glm::dvec3());
+		camera.SetTarget(RBall(0)->model.position);
+	}
+	else
+	{
+		camera.SetOffset(RBall(0)->model.position);
+		camera.SetTarget(glm::dvec3());
+	}
 	camera.Set();
 }
 
 void MainScene::Render2D()
 {
 	//　文字の描画
+	glColor4f(1.f, 1.f, 1.f, 1.f);
 	drawText((char *)FpsString, FONT_BOKU, glm::uvec2(20, 40), glm::vec2());
+
+	glColor4f(0.f, 0.f, 0.f, 1.f);
+	drawText("Shot : Enter", FONT_MISAKI, glm::uvec2(windowSize.x - 200, 40), glm::vec2());
+	drawText("Angle : Drag", FONT_MISAKI, glm::uvec2(windowSize.x - 200, 80), glm::vec2());
 }
 
 void MainScene::Render3D()
@@ -93,7 +108,7 @@ void MainScene::Render3D()
 		glm::vec3 pos = RBall(0)->model.position;
 		glPushMatrix();
 		glTranslatef(pos.x, pos.y, pos.z);
-		glRotatef(RadToDeg(camera.angle[0]) + 90, 0.f, 1.f, 0.f);
+		glRotatef(RadToDeg(camera.GetAngle().x) + 90, 0.f, 1.f, 0.f);
 		glTranslatef(-9.0f, 0.45f, 0.f);
 		glRotatef(-93.f, 0.f, 0.f, 1.f);
 		glTranslatef(0.f, -distance, 0.f);
@@ -107,10 +122,14 @@ void MainScene::Update()
 	if (shotFlag)
 	{
 		bool isMove = false;
+		bool pocketFlag = false;
+		float maxHitScale = 0.f;
 		for (int i = 0; i <= 15; ++i)
 		{
 			Ball* ball = RBall(i);
+			ball->ResetHit();
 			ball->Move();
+			ball->TestPocket();
 			ball->TestCollisionWall();
 			for (int j = 0; j < 16; ++j)
 			{
@@ -119,12 +138,36 @@ void MainScene::Update()
 					ball->TestCollisionBall(RBall(j));
 				}
 			}
-			ball->TestPocket();
 			ball->UpdateVelocity();
-			if (ball->isMove)
+
+			// 動いている
+			if (ball->status == MOVE || ball->status == FALL)
 			{
 				isMove = true;
 			}
+			// ボールの衝突音の最大値を求める
+			maxHitScale = max(maxHitScale, ball->GetHitScale());
+
+			if (ball->lastStatus != ball->status)
+			{
+				if (ball->status == POCKET)
+				{
+					pocketFlag = true;
+				}
+			}
+
+			ball->lastStatus = ball->status;
+		}
+		if (maxHitScale > 0.f && CurrentTime - lastHitTime > 0.05)
+		{
+			maxHitScale = min(maxHitScale, 1.f);
+			RSound(SE_BALL)->SetGain(maxHitScale);
+			RSound(SE_BALL)->Play();
+			lastHitTime = CurrentTime;
+		}
+		if (pocketFlag)
+		{
+			RSound(SE_POCKET)->Play();
 		}
 		if (!isMove)
 		{
@@ -148,8 +191,10 @@ void MainScene::Keyboard(KEY key)
 		if (!shotFlag)
 		{
 			speed = 0.25f;
-			angle = (float)camera.angle[0];
+			angle = (float)camera.GetAngle().x;
 			RBall(0)->AddVec(glm::vec3(speed*-sin(angle), 0.f, speed*-cos(angle)));
+			RSound(SE_SHOT)->SetGain(0.5f);
+			RSound(SE_SHOT)->Play();
 			shotFlag = true;
 		}
 		break;

@@ -2,23 +2,29 @@
 
 #include "XLoader.h"
 
+enum BallStatus
+{
+	STOP, MOVE, FALL, POCKET
+};
+
 class Ball
 {
 private:
 	glm::vec3 wallMin;
 	glm::vec3 wallMax;
 	glm::vec3 rotVelocity;
-
+	glm::vec3 pocketPos[6];
+	float hitScale; // è’ìÀâπóp
 public:
-	bool isFall;
-	bool isMove;
+	BallStatus status;
+	BallStatus lastStatus;
 	XModel model;
 	glm::vec3 velocity;
 
 	Ball()
 	{
-		isFall = false;
-		isMove = false;
+		status = STOP;
+		lastStatus = STOP;
 		velocity = glm::vec3(0.0f);
 		rotVelocity = glm::vec3(0.0f);
 	};
@@ -29,4 +35,6 @@ public:
 	void TestCollisionBall(Ball* ball);
 	void UpdateVelocity();
 	void TestPocket();
+	void ResetHit() { hitScale = 0.f; }
+	float GetHitScale() { return hitScale; }
 };

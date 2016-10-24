@@ -75,7 +75,6 @@ private:
 	bool enableMiddleX;
 	bool enableMiddleY;
 
-public:
 	MouseButton right;
 	MouseButton left;
 	MouseButton middle;
@@ -86,7 +85,9 @@ public:
 	glm::dvec3 target;
 	glm::dvec3 upvector;
 	glm::dvec3 translate;
+	glm::dvec3 offset;
 
+public:
 	ViewCamera(double dist = 45.0);
 	~ViewCamera();
 	void Reset();
@@ -106,15 +107,10 @@ public:
 		enableMiddleX = x;
 		enableMiddleY = y;
 	}
-	void SetDistance(double d) {
-		distance = d;
-	}
-	void SetAngleDeg(glm::dvec3 a) {
-		angle[0] = DegToRad(a.x);
-		angle[1] = DegToRad(a.y);
-		angle[2] = DegToRad(a.z);
-	}
-	void SetTarget(glm::dvec3 t) {
-		target = t;
-	}
+	void SetDistance(double d) { distance = d; }
+	glm::vec3 GetAngle() { return angle; }
+	void SetAngleDeg(glm::dvec3 a) { angle = a*(PI / 180.0); }
+	void SetTarget(glm::dvec3 t) { target = t; }
+	void SetTranslate(glm::dvec3 t) { translate = t; }
+	void SetOffset(glm::dvec3 o) { offset = o; }
 };

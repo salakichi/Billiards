@@ -13,7 +13,11 @@ private:
 	// カメラ
 	ViewCamera camera;
 
+	// ボールを打って、止まるまでtrue
 	bool shotFlag;
+
+	// 最後にボールが衝突した時間
+	double lastHitTime;
 public:
 	MainScene(ResourceManager& resource, glm::uvec2 &size);
 	~MainScene();

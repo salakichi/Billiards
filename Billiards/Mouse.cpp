@@ -230,21 +230,12 @@ void ViewCamera::Reset()
 	right.Reset();
 	middle.Reset();
 
-	angle[0] = DegToRad(0.0);
-	angle[1] = DegToRad(45.0);
-	angle[2] = 0.0;
-	position[0] = 0.0;
-	position[1] = 0.0;
-	position[2] = 0.0;
-	target[0] = 0.0;
-	target[1] = 0.0;
-	target[2] = 0.0;
-	upvector[0] = 0.0;
-	upvector[1] = 1.0;
-	upvector[2] = 0.0;
-	translate[0] = 0.0;
-	translate[1] = 0.0;
-	translate[2] = 0.0;
+	angle = glm::dvec3();
+	position = glm::dvec3();
+	target = glm::dvec3();
+	upvector = glm::dvec3(0.0, 1.0, 0.0);
+	translate = glm::dvec3();
+	offset = glm::dvec3();
 }
 
 
@@ -286,8 +277,8 @@ void ViewCamera::Set()
 
 	//Å@éãì_à íuÇÃê›íË
 	gluLookAt(
-		position[0], position[1], position[2],
-		target[0], target[1], target[2],
+		position[0] + offset[0], position[1] + offset[1], position[2] + offset[2],
+		target[0] + offset[0], target[1] + offset[1], target[2] + offset[2],
 		upvector[0], upvector[1], upvector[2]);
 
 }
