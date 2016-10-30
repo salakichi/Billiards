@@ -158,6 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Ball.h" />
+    <ClInclude Include="FinishScene.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="lodepng.h" />
@@ -180,6 +181,7 @@
   <ItemGroup>
     <ClCompile Include="Ball.cpp" />
     <ClCompile Include="Billiards.cpp" />
+    <ClCompile Include="FinishScene.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="lodepng.cpp" />

@@ -11,7 +11,7 @@ enum KEY {
 };
 
 enum GAME_STATUS {
-	NONE, TITLE, MAIN, CONTINUE, GAMECLEAR, GAMEOVER,
+	NONE, TITLE, MAIN, FINISH,
 };
 
 class Scene
@@ -32,6 +32,9 @@ protected:
 	Ball* RBall(int i) { return resource.balls[i]; }
 	Sound* RSound(string name) { return resource.soundList[name]; }
 	Font* RFont(string name) { return resource.fontList[name]; }
+	int GetScore() { return resource.score; }
+	void SetScore(int score) { resource.score = score; }
+	void AddScore(int score) { resource.score += score; }
 
 	// シーン遷移用
 	GAME_STATUS nextScene;
@@ -46,6 +49,8 @@ protected:
 	void DrawLargeCircle(float radius, int x, int y);		// 半径制限なし 品質：悪
 	int drawText(char *text, string fontName, glm::uvec2 pos, glm::vec2 move);
 	int drawText(char *text, string fontName, glm::uvec2 pos, glm::vec2 move, glm::vec4 mainColor, glm::vec4 edgeColor, int edgeSize);
+	void DrawSquareWithEdge(glm::uvec2 startPos, glm::uvec2 endPos, glm::vec4 mainColor, glm::vec4 edgeColor = glm::vec4(), float edgeSize = 0.f);
+	void DrawSquareWithGradation(glm::uvec2 startPos, glm::uvec2 endPos, glm::vec4 startColor, glm::vec4 endColor);
 public:
 	Scene(ResourceManager &r, glm::uvec2 &size);
 	~Scene();

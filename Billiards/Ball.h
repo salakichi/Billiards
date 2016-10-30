@@ -21,13 +21,8 @@ public:
 	XModel model;
 	glm::vec3 velocity;
 
-	Ball()
-	{
-		status = STOP;
-		lastStatus = STOP;
-		velocity = glm::vec3(0.0f);
-		rotVelocity = glm::vec3(0.0f);
-	};
+	Ball() {}
+	void Initialize();
 	void SetWall(glm::vec3 min, glm::vec3 max);
 	void AddVec(glm::vec3 addVel);
 	void Move();
@@ -37,4 +32,5 @@ public:
 	void TestPocket();
 	void ResetHit() { hitScale = 0.f; }
 	float GetHitScale() { return hitScale; }
+	bool isMove() { return (status == MOVE || status == FALL); }
 };

@@ -1,6 +1,14 @@
 #include "stdafx.h"
 #include "Ball.h"
 
+void Ball::Initialize()
+{
+	status = STOP;
+	lastStatus = STOP;
+	velocity = glm::vec3(0.0f);
+	rotVelocity = glm::vec3(0.0f);
+}
+
 void Ball::SetWall(glm::vec3 min, glm::vec3 max)
 {
 	wallMin = min;
@@ -117,14 +125,28 @@ void Ball::TestPocket()
 	if (status == MOVE)
 	{
 		glm::vec3 pos = model.position;
-		float r = model.sphere.radius * 1.5f;
+		pos.y = 0.f;
+		float r = model.sphere.radius;
 
-		for (int i = 0; i < 6; ++i)
+		// ^‚ñ’†‚ÌŒŠ
+		if (glm::length(pocketPos[0] - pos) < r * 1.5f && velocity.z < 0.f)
 		{
-			float distance = glm::length(pocketPos[i] - pos);
-			if (distance < r)
+			status = FALL;
+		}
+		else if (glm::length(pocketPos[1] - pos) < r * 1.5f && velocity.z > 0.f)
+		{
+			status = FALL;
+		}
+		else
+		{
+			// ’[‚ÌŒŠ
+			for (int i = 2; i < 6; ++i)
 			{
-				status = FALL;
+				float distance = glm::length(pocketPos[i] - pos);
+				if (distance < r * 2.f)
+				{
+					status = FALL;
+				}
 			}
 		}
 	}

@@ -32,7 +32,7 @@ void Scene::UpdateFps()
 	if ((CurrentTime - LastTime) >= 1.0)
 	{
 		Fps = FrameCount / (CurrentTime - LastTime);
-		sprintf_s(FpsString, "%.3f FPS", Fps);
+		sprintf_s(FpsString, "%.1fFPS", Fps);
 		FrameCount = 0;
 		LastTime = CurrentTime;
 	}
@@ -133,4 +133,41 @@ int Scene::drawText(char *text, string fontName, glm::uvec2 pos, glm::vec2 move,
 	}
 
 	return 1;
+}
+
+void Scene::DrawSquareWithEdge(glm::uvec2 startPos, glm::uvec2 endPos, glm::vec4 mainColor, glm::vec4 edgeColor, float edgeSize)
+{
+	glColor4f(mainColor.r, mainColor.g, mainColor.b, mainColor.a);
+	glBegin(GL_QUADS);
+	glVertex2i(startPos.x, startPos.y);
+	glVertex2i(endPos.x, startPos.y);
+	glVertex2i(endPos.x, endPos.y);
+	glVertex2i(startPos.x, endPos.y);
+	glEnd();
+
+	if (edgeSize > 0.f)
+	{
+		glColor4f(edgeColor.r, edgeColor.g, edgeColor.b, edgeColor.a);
+		glLineWidth(edgeSize);
+		glBegin(GL_LINE_LOOP);
+		glVertex2i(startPos.x, startPos.y);
+		glVertex2i(endPos.x, startPos.y);
+		glVertex2i(endPos.x, endPos.y);
+		glVertex2i(startPos.x, endPos.y);
+		glEnd();
+	}
+}
+
+void Scene::DrawSquareWithGradation(glm::uvec2 startPos, glm::uvec2 endPos, glm::vec4 startColor, glm::vec4 endColor)
+{
+	glBegin(GL_QUADS);
+	glColor4f(startColor.r, startColor.g, startColor.b, startColor.a);
+	glVertex2i(startPos.x, startPos.y);
+	glColor4f(startColor.r, startColor.g, startColor.b, startColor.a);
+	glVertex2i(endPos.x, startPos.y);
+	glColor4f(endColor.r, endColor.g, endColor.b, endColor.a);
+	glVertex2i(endPos.x, endPos.y);
+	glColor4f(endColor.r, endColor.g, endColor.b, endColor.a);
+	glVertex2i(startPos.x, endPos.y);
+	glEnd();
 }

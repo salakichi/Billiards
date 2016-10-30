@@ -23,6 +23,8 @@
 #define MODEL_CUE "data\\model\\cue.x"
 #define FONT_MISAKI "data\\font\\misaki_gothic.ttf"
 #define FONT_BOKU "data\\font\\bokutachi.otf"
+#define FONT_CONTRA "data\\font\\CONTRA.ttf"
+#define FONT_CONTRA_ITALIC "data\\font\\CONTRAI.ttf"
 #define BGM_TITLE "data\\bgm\\title.wav"
 #define BGM_MAIN "data\\bgm\\main.wav"
 #define SE_START "data\\se\\start.wav"
@@ -56,4 +58,6 @@ public:
 
 	// サウンドデータ
 	map<string, Sound*> soundList;
+
+	int score;
 };

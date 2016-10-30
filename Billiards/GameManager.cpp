@@ -442,6 +442,8 @@ void GameManager::Update()
 		case MAIN:
 			scene = new MainScene(resource, windowSize);
 			break;
+		case FINISH:
+			scene = new FinishScene(resource, windowSize);
 		default:
 			ErrorLog("Unknown Scene");
 			break;

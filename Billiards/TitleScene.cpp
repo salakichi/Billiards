@@ -20,6 +20,7 @@ TitleScene::TitleScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 	glm::vec3 wallMax = glm::vec3(tableModel->box.max.x - padding, 0.f, tableModel->box.max.z - padding);
 	for (int i = 0; i <= 15; ++i)
 	{
+		RBall(i)->Initialize();
 		RBall(i)->SetWall(wallMin, wallMax);
 		RBall(i)->model.EnableRotate();
 	}
@@ -35,6 +36,9 @@ TitleScene::TitleScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 			++k;
 		}
 	}
+
+	// フォントサイズ
+	RFont(FONT_MISAKI)->SetSize(48);
 
 	// BGMを流す
 	RSound(BGM_TITLE)->Play();
@@ -88,12 +92,12 @@ void TitleScene::Render2D()
 
 	// FPSの描画
 	glColor4f(1.f, 1.f, 1.f, 1.f);
-	drawText(FpsString, FONT_BOKU, glm::uvec2(20, 40), glm::vec2());
+	drawText(FpsString, FONT_CONTRA, glm::uvec2(20, 40), glm::vec2());
 
-	drawText("OpenGL Billiards", FONT_MISAKI, glm::uvec2(windowSize.x / 2 - 120, windowSize.y / 4), glm::vec2());
+	drawText("OpenGL Billiards", FONT_MISAKI, glm::uvec2(windowSize.x / 2 - 192, windowSize.y / 4), glm::vec2());
 
 	glColor4f(1.f, 1.f, 1.f, (float)rate);
-	drawText("Press Enter", FONT_MISAKI, glm::uvec2(windowSize.x / 2 - 80, windowSize.y * 3 / 4), glm::vec2());
+	drawText("Press Enter", FONT_MISAKI, glm::uvec2(windowSize.x / 2 - 132, windowSize.y * 3 / 4), glm::vec2());
 }
 
 void TitleScene::Render3D()

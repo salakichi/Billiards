@@ -5,7 +5,9 @@ bool loadFinishFlag = false;
 
 char* fontFileList[] = {
 	FONT_BOKU,
-	FONT_MISAKI
+	FONT_MISAKI,
+	FONT_CONTRA,
+	FONT_CONTRA_ITALIC
 };
 
 char* bgmFileList[] = {
