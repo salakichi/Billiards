@@ -1,6 +1,7 @@
 #pragma once
 
 #include "XLoader.h"
+#include "TimeManager.h"
 
 enum BallStatus
 {

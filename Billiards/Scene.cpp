@@ -3,13 +3,6 @@
 
 Scene::Scene(ResourceManager &r, glm::uvec2 &size) : resource(r), windowSize(size)
 {
-	//　カウンターの初期化
-	CurrentCount = LastCount = glutGet(GLUT_ELAPSED_TIME);
-	FrameCount = 0;
-	CurrentTime = 0.0;
-	LastTime = 0.0;
-	Fps = 0.0f;
-
 	// 次のシーンを空に
 	nextScene = NONE;
 }
@@ -21,21 +14,6 @@ Scene::~Scene()
 void Scene::Next(GAME_STATUS next)
 {
 	nextScene = next;
-}
-
-void Scene::UpdateFps()
-{
-	//　時間計測とFPS算出
-	CurrentCount = glutGet(GLUT_ELAPSED_TIME);
-	CurrentTime = (CurrentCount - LastCount) / 1000.0;
-	FrameCount++;
-	if ((CurrentTime - LastTime) >= 1.0)
-	{
-		Fps = FrameCount / (CurrentTime - LastTime);
-		sprintf_s(FpsString, "%.1fFPS", Fps);
-		FrameCount = 0;
-		LastTime = CurrentTime;
-	}
 }
 
 void Scene::DrawSmallCircle(float radius, int x, int y)

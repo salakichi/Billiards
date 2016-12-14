@@ -95,7 +95,7 @@ void MainScene::Render2D()
 
 	//@•¶Žš‚Ì•`‰æ
 	glColor4f(1.f, 1.f, 1.f, 1.f);
-	drawText((char *)FpsString, FONT_CONTRA, glm::uvec2(20, 40), glm::vec2());
+	drawText((char *)TimeManager::Instance().GetFpsString(), FONT_CONTRA, glm::uvec2(20, 40), glm::vec2());
 	drawText(scoreString, FONT_CONTRA_ITALIC, glm::uvec2(20, 80), glm::vec2());
 	drawText(comboString, FONT_CONTRA_ITALIC, glm::uvec2(20, 120), glm::vec2());
 
@@ -109,7 +109,7 @@ void MainScene::Render2D()
 	if (status == SELECT_POWER)
 	{
 		// ƒQ[ƒW‚ð2•b‚ÌŽüŠú‚É‚·‚é
-		shotPower = getPeriodRatio(2.0);
+		shotPower = TimeManager::Instance().GetPeriodRatio(2.0, statusChangedTime);
 		glm::uvec2 center = glm::uvec2(windowSize.x / 2, windowSize.y / 2);
 		DrawSquareWithGradation(glm::uvec2(center.x + 100, center.y + 50 - 100 * shotPower), glm::uvec2(center.x + 120, center.y + 50), glm::vec4(1.f, 1.f-shotPower, 0.f, 1.f), glm::vec4(1.f, 1.f, 0.f, 1.f));
 		DrawSquareWithEdge(glm::uvec2(center.x + 100, center.y - 50), glm::uvec2(center.x + 120, center.y + 50), glm::vec4(0.f, 0.f, 0.f, 0.5f), glm::vec4(0.f, 0.f, 0.f, 1.f), 2.f);
@@ -129,7 +129,7 @@ void MainScene::Render3D()
 	if (status != SHOT)
 	{
 		// ƒLƒ…[‚ð2•bŽüŠú‚ÅˆÚ“®‚³‚¹‚é
-		double distance = getPeriodRatio(2.0);
+		double distance = TimeManager::Instance().GetPeriodRatio(2.0, statusChangedTime);
 
 		float angle = (float)camera.GetAngle().x;
 		if (status == SELECT_POWER)
@@ -206,12 +206,13 @@ void MainScene::Update()
 			ball->lastStatus = ball->status;
 		}
 		// ƒ{[ƒ‹“¯Žm‚ªÕ“Ë‚µ‚Ä‚¢‚ê‚Î
-		if (maxHitScale > 0.f && CurrentTime - lastHitTime > 0.05)
+		double currentTime = TimeManager::Instance().GetCurrentTime();
+		if (maxHitScale > 0.f && currentTime - lastHitTime > 0.05)
 		{
 			maxHitScale = min(maxHitScale, 1.f);
 			RSound(SE_BALL)->SetGain(maxHitScale);
 			RSound(SE_BALL)->Play();
-			lastHitTime = CurrentTime;
+			lastHitTime = currentTime;
 		}
 		if (pocketFlag)
 		{
@@ -305,16 +306,5 @@ void MainScene::Motion(int x, int y)
 void MainScene::ChangeStatus(MAIN_SCENE_STATUS next)
 {
 	status = next;
-	statusChangedTime = CurrentTime;
-}
-
-double MainScene::getPeriodRatio(double period)
-{
-	double elapsedTime = CurrentTime - statusChangedTime;
-	double ratio = ((elapsedTime - (double)((int)(elapsedTime / period)) * period) / period) * 2.0;
-	if (ratio > 1.0)
-	{
-		ratio = 2 - ratio;
-	}
-	return ratio;
+	statusChangedTime = TimeManager::Instance().GetCurrentTime();
 }

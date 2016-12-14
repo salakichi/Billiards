@@ -32,15 +32,16 @@ void Ball::AddVec(glm::vec3 addVel)
 
 void Ball::Move()
 {
+	float timeRatio = (float)(TimeManager::Instance().GetDeltaTime() / 16.666);
 	if (status == MOVE)
 	{
-		position += velocity;
-		rotVelocity = glm::normalize(glm::cross(glm::vec3(0.f, 1.f, 0.f), velocity)) * glm::length(velocity) * 2.f;
+		position += velocity * timeRatio;
+		rotVelocity = glm::normalize(glm::cross(glm::vec3(0.f, 1.f, 0.f), velocity)) * glm::length(velocity) * 2.f * timeRatio;
 		rotation *= glm::rotate(glm::mat4(1.0f), glm::length(rotVelocity), glm::normalize(rotVelocity));
 	}
 	else if (status == FALL)
 	{
-		position += velocity;
+		position += velocity * timeRatio;
 		if (position.y < -5.f)
 		{
 			position.y = -5.f;
@@ -94,9 +95,10 @@ void Ball::TestCollisionBall(Ball* ball)
 
 void Ball::UpdateVelocity()
 {
+	float timeRatio = (float)(TimeManager::Instance().GetDeltaTime() / 16.666);
 	if (status == MOVE)
 	{
-		float dv = 0.007f;
+		float dv = 0.007f * timeRatio;
 		velocity *= (1.f - dv);
 
 		if (glm::length(velocity) < 0.003f)
@@ -111,9 +113,9 @@ void Ball::UpdateVelocity()
 	{
 		if (position.x < wallMin.x + size || position.x > wallMax.x - size || position.z < wallMin.z + size || position.z > wallMax.z - size)
 		{
-			velocity.x *= 0.9f;
-			velocity.y -= 0.06f;
-			velocity.z *= 0.9f;
+			velocity.x *= (1.f - timeRatio);
+			velocity.y -= 0.06f * timeRatio;
+			velocity.z *= (1.f - timeRatio);
 		}
 	}
 }

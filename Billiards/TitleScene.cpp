@@ -54,7 +54,8 @@ void TitleScene::Finish()
 void TitleScene::SetCamera()
 {
 	// 30•b‚ÌŽüŠú‚É‚·‚é
-	double elapsedTime = CurrentTime - (double)((int)(CurrentTime / 30.0)) * 30.0;
+	double currentTime = TimeManager::Instance().GetCurrentTime();
+	double elapsedTime = currentTime - (double)((int)(currentTime / 30.0)) * 30.0;
 	glm::vec3 position;
 	glm::vec3 angle    = glm::vec3(DegToRad(elapsedTime*12.0), DegToRad(45.0), 0.0);
 	glm::vec3 target   = glm::vec3();
@@ -80,16 +81,11 @@ void TitleScene::SetCamera()
 void TitleScene::Render2D()
 {
 	// 2•b‚ÌŽüŠú‚É‚·‚é
-	double elapsedTime = CurrentTime - (double)((int)(CurrentTime / 2.0)) * 2.0;
-	double rate = elapsedTime;
-	if (elapsedTime > 1.0)
-	{
-		rate = 2.0 - elapsedTime;
-	}
+	double rate = TimeManager::Instance().GetPeriodRatio(2.0);
 
 	// FPS‚Ì•`‰æ
 	glColor4f(1.f, 1.f, 1.f, 1.f);
-	drawText(FpsString, FONT_CONTRA, glm::uvec2(20, 40), glm::vec2());
+	drawText(TimeManager::Instance().GetFpsString(), FONT_CONTRA, glm::uvec2(20, 40), glm::vec2());
 
 	drawText("OpenGL Billiards", FONT_MISAKI, glm::uvec2(windowSize.x / 2 - 192, windowSize.y / 4), glm::vec2());
 

@@ -25,9 +25,6 @@ private:
 	// ó‘Ô•ÏX
 	void ChangeStatus(MAIN_SCENE_STATUS next);
 
-	// n•büŠú‚Å0-1‘Œ¸‚·‚é‚Æ‚«‚ÌŒ»İ‚ÌŠ„‡(0`1)
-	double getPeriodRatio(double period);
-
 	// ƒJƒƒ‰
 	ViewCamera camera;
 

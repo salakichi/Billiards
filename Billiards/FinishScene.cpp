@@ -45,7 +45,7 @@ void FinishScene::Render2D()
 
 	//Å@ï∂éöÇÃï`âÊ
 	glColor4f(1.f, 1.f, 1.f, 1.f);
-	drawText((char *)FpsString, FONT_CONTRA, glm::uvec2(20, 40), glm::vec2());
+	drawText(TimeManager::Instance().GetFpsString(), FONT_CONTRA, glm::uvec2(20, 40), glm::vec2());
 
 	drawText("Finish", FONT_CONTRA_ITALIC, glm::uvec2(windowSize.x / 2 - 100, windowSize.y / 2), glm::vec2());
 	drawText(scoreString, FONT_CONTRA_ITALIC, glm::uvec2(windowSize.x / 2 - 100, windowSize.y / 2 + 40), glm::vec2());

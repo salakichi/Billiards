@@ -427,6 +427,9 @@ void GameManager::Render()
 
 void GameManager::Update()
 {
+	// タイマー更新
+	TimeManager::Instance().Update();
+
 	if (scene->IsFinished())
 	{
 		// 画面遷移
@@ -451,7 +454,6 @@ void GameManager::Update()
 	}
 	else
 	{
-		scene->UpdateFps();
 		scene->Update();
 	}
 }

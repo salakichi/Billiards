@@ -15,6 +15,7 @@ private:
 	void Render3D();
 	void RenderWithoutShadow();
 	void RenderWithShadow();
+	void UpdateFps();
 
 	// シャドウ用
 	GLuint shadowTexture;
@@ -28,6 +29,12 @@ private:
 	// ウィンドウ用
 	glm::uvec2 windowSize;
 public:
+	// シングルトン用のインスタンス
+	static GameManager &Instance() {
+		static GameManager inst;
+		return inst;
+	}
+
 	GameManager();
 	~GameManager();
 	bool Initialize(int argc, char** argv);

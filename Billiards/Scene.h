@@ -17,15 +17,6 @@ enum GAME_STATUS {
 class Scene
 {
 protected:
-	// FPS用
-	double CurrentTime;
-	double LastTime;
-	double CurrentCount;
-	double LastCount;
-	int FrameCount;
-	double Fps;
-	char FpsString[50];
-
 	// リソースアクセス用
 	ResourceManager& resource;
 	XModel* RModel(string name) { return resource.modelList[name]; }
@@ -54,7 +45,7 @@ protected:
 public:
 	Scene(ResourceManager &r, glm::uvec2 &size);
 	~Scene();
-	void UpdateFps();
+	
 	bool IsFinished() { return nextScene != NONE; }
 	GAME_STATUS GetNextScene() { return nextScene; }
 
