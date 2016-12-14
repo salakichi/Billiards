@@ -65,7 +65,7 @@ void FinishScene::Render3D()
 	for (int i = 0; i <= 15; ++i)
 	{
 		if (RBall(i)->status != POCKET)
-			RBall(i)->model.Render();
+			RBall(i)->Render();
 	}
 	RModel(MODEL_TABLE)->Render();
 	RModel(MODEL_STAGE)->Render();

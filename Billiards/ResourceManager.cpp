@@ -127,7 +127,7 @@ bool ResourceManager::Load()
 		{
 			Ball* ball = new Ball();
 			sprintf_s(ballFilename, MODEL_BALL, i);
-			loadResult = ball->model.Load(ballFilename);
+			loadResult = ball->Load(ballFilename);
 			if (!loadResult) throw ballFilename;
 			balls[i] = ball;
 		}

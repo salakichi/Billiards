@@ -18,21 +18,18 @@ TitleScene::TitleScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 	float padding = 2.4f;
 	glm::vec3 wallMin = glm::vec3(-tableModel->box.max.x + padding, 0.f, -tableModel->box.max.z + padding);
 	glm::vec3 wallMax = glm::vec3(tableModel->box.max.x - padding, 0.f, tableModel->box.max.z - padding);
-	for (int i = 0; i <= 15; ++i)
-	{
-		RBall(i)->Initialize();
-		RBall(i)->SetWall(wallMin, wallMax);
-		RBall(i)->model.EnableRotate();
-	}
+	
+	RBall(0)->Initialize(glm::vec3());
+	RBall(0)->SetWall(wallMin, wallMax);
 
-	RBall(0)->model.position = glm::vec3(0.f, 0.f, 0.f);
-	float r = RBall(0)->model.sphere.radius*2.f;
+	float r = RBall(0)->size*2.f;
 	int k = 1;
 	for (int i = 0; i < 5; ++i)
 	{
 		for (int j = 0; j < 5 - i; ++j)
 		{
-			RBall(k)->model.position = glm::vec3(9.0f - j*r*sin(M_PI / 3), 0.f, j*r*cos(M_PI / 3) + (i - 2)*r);
+			RBall(k)->Initialize(glm::vec3(9.0f - j*r*sin(M_PI / 3), 0.f, j*r*cos(M_PI / 3) + (i - 2)*r));
+			RBall(k)->SetWall(wallMin, wallMax);
 			++k;
 		}
 	}
@@ -104,7 +101,7 @@ void TitleScene::Render3D()
 {
 	for (int i = 0; i <= 15; ++i)
 	{
-		RBall(i)->model.Render();
+		RBall(i)->Render();
 	}
 	RModel(MODEL_TABLE)->Render();
 	RModel(MODEL_STAGE)->Render();

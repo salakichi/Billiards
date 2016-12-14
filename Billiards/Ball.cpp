@@ -1,12 +1,14 @@
 #include "stdafx.h"
 #include "Ball.h"
 
-void Ball::Initialize()
+void Ball::Initialize(glm::vec3 pos)
 {
 	status = STOP;
 	lastStatus = STOP;
 	velocity = glm::vec3(0.0f);
 	rotVelocity = glm::vec3(0.0f);
+	position = pos;
+	rotation = glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(1.0, 0.0, 0.0));
 }
 
 void Ball::SetWall(glm::vec3 min, glm::vec3 max)
@@ -32,16 +34,16 @@ void Ball::Move()
 {
 	if (status == MOVE)
 	{
-		model.position += velocity;
+		position += velocity;
 		rotVelocity = glm::normalize(glm::cross(glm::vec3(0.f, 1.f, 0.f), velocity)) * glm::length(velocity) * 2.f;
-		model.rotation *= glm::rotate(glm::mat4(1.0f), glm::length(rotVelocity), glm::normalize(rotVelocity));
+		rotation *= glm::rotate(glm::mat4(1.0f), glm::length(rotVelocity), glm::normalize(rotVelocity));
 	}
 	else if (status == FALL)
 	{
-		model.position += velocity;
-		if (model.position.y < -5.f)
+		position += velocity;
+		if (position.y < -5.f)
 		{
-			model.position.y = -5.f;
+			position.y = -5.f;
 			status = POCKET;
 		}
 	}
@@ -51,16 +53,14 @@ void Ball::TestCollisionWall()
 {
 	if (status == MOVE)
 	{
-		glm::vec3 pos = model.position;
-		float r = model.sphere.radius;
 		bool xHitFlag = false;
 		bool zHitFlag = false;
 
-		if ((pos.x < wallMin.x + r && velocity.x < 0.0f) || (pos.x > wallMax.x - r && velocity.x > 0.0f))
+		if ((position.x < wallMin.x + size && velocity.x < 0.0f) || (position.x > wallMax.x - size && velocity.x > 0.0f))
 		{
 			xHitFlag = true;
 		}
-		if ((pos.z < wallMin.z + r && velocity.z < 0.0f) || (pos.z > wallMax.z - r && velocity.z > 0.0f))
+		if ((position.z < wallMin.z + size && velocity.z < 0.0f) || (position.z > wallMax.z - size && velocity.z > 0.0f))
 		{
 			zHitFlag = true;
 		}
@@ -74,12 +74,12 @@ void Ball::TestCollisionBall(Ball* ball)
 {
 	if (status == MOVE)
 	{
-		float old_distance = glm::distance(model.position - velocity, ball->model.position);
-		float distance = glm::distance(model.position, ball->model.position);
+		float old_distance = glm::distance(position - velocity, ball->position);
+		float distance = glm::distance(position, ball->position);
 		// ãﬂÇ√Ç¢Çƒê⁄êGÇµÇΩÇÁ
-		if (old_distance > distance && distance < model.sphere.radius + ball->model.sphere.radius)
+		if (old_distance > distance && distance < size + ball->size)
 		{
-			glm::vec3 vec = glm::normalize(ball->model.position - model.position);
+			glm::vec3 vec = glm::normalize(ball->position - position);
 			glm::vec3 gap = glm::dot(velocity, vec)*vec - glm::dot(ball->velocity, -vec)*(-vec);
 			if (glm::length(gap) > FLT_EPSILON)
 			{
@@ -109,9 +109,7 @@ void Ball::UpdateVelocity()
 	}
 	else if (status == FALL)
 	{
-		glm::vec3 pos = model.position;
-		float r = model.sphere.radius;
-		if (pos.x < wallMin.x + r || pos.x > wallMax.x - r || pos.z < wallMin.z + r || pos.z > wallMax.z - r)
+		if (position.x < wallMin.x + size || position.x > wallMax.x - size || position.z < wallMin.z + size || position.z > wallMax.z - size)
 		{
 			velocity.x *= 0.9f;
 			velocity.y -= 0.06f;
@@ -124,16 +122,14 @@ void Ball::TestPocket()
 {
 	if (status == MOVE)
 	{
-		glm::vec3 pos = model.position;
-		pos.y = 0.f;
-		float r = model.sphere.radius;
+		position.y = 0.f;
 
 		// ê^ÇÒíÜÇÃåä
-		if (glm::length(pocketPos[0] - pos) < r * 1.5f && velocity.z < 0.f)
+		if (glm::length(pocketPos[0] - position) < size * 1.5f && velocity.z < 0.f)
 		{
 			status = FALL;
 		}
-		else if (glm::length(pocketPos[1] - pos) < r * 1.5f && velocity.z > 0.f)
+		else if (glm::length(pocketPos[1] - position) < size * 1.5f && velocity.z > 0.f)
 		{
 			status = FALL;
 		}
@@ -142,12 +138,33 @@ void Ball::TestPocket()
 			// í[ÇÃåä
 			for (int i = 2; i < 6; ++i)
 			{
-				float distance = glm::length(pocketPos[i] - pos);
-				if (distance < r * 2.f)
+				float distance = glm::length(pocketPos[i] - position);
+				if (distance < size * 2.f)
 				{
 					status = FALL;
 				}
 			}
 		}
 	}
-};
+}
+
+bool Ball::Load(char *filename, float scale)
+{
+	bool result = model.Load(filename, scale);
+	if (result) {
+		size = model.sphere.radius;
+	}
+	return result;
+}
+
+void Ball::Render()
+{
+	glPushMatrix();
+
+	glm::mat4x4 transRotMat = glm::translate<float>(glm::mat4(1.0f), position) * rotation * glm::translate<float>(glm::mat4(1.0f), glm::vec3(0.f, -size, 0.f));
+	glMultMatrixf(&transRotMat[0][0]);
+
+	model.Render();
+
+	glPopMatrix();
+}

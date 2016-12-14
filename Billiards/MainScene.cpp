@@ -18,21 +18,18 @@ MainScene::MainScene(ResourceManager& rm, glm::uvec2 &size) : Scene(rm, size)
 	float padding = 2.3f;
 	glm::vec3 wallMin = glm::vec3(-tableModel->box.max.x + padding, 0.f, -tableModel->box.max.z + padding);
 	glm::vec3 wallMax = glm::vec3(tableModel->box.max.x - padding, 0.f, tableModel->box.max.z - padding);
-	for (int i = 0; i <= 15; ++i)
-	{
-		RBall(i)->Initialize();
-		RBall(i)->SetWall(wallMin, wallMax);
-		RBall(i)->model.EnableRotate();
-	}
 
-	RBall(0)->model.position = glm::vec3();
-	float r = RBall(0)->model.sphere.radius*2.f;
+	RBall(0)->Initialize(glm::vec3());
+	RBall(0)->SetWall(wallMin, wallMax);
+
+	float r = RBall(0)->size*2.f;
 	int k = 1;
 	for (int i = 0; i < 5; ++i)
 	{
 		for (int j = 0; j < 5 - i; ++j)
 		{
-			RBall(k)->model.position = glm::vec3(9.0f - j*r*sin(M_PI / 3), 0.f, j*r*cos(M_PI / 3) + (i - 2)*r);
+			RBall(k)->Initialize(glm::vec3(9.0f - j*r*sin(M_PI / 3), 0.f, j*r*cos(M_PI / 3) + (i - 2)*r));
+			RBall(k)->SetWall(wallMin, wallMax);
 			++k;
 		}
 	}
@@ -78,11 +75,11 @@ void MainScene::SetCamera()
 	if (status == SHOT)
 	{
 		camera.SetOffset(glm::dvec3());
-		camera.SetTarget(RBall(0)->model.position);
+		camera.SetTarget(RBall(0)->position);
 	}
 	else
 	{
-		camera.SetOffset(RBall(0)->model.position);
+		camera.SetOffset(RBall(0)->position);
 		camera.SetTarget(glm::dvec3());
 	}
 	camera.Set();
@@ -124,7 +121,7 @@ void MainScene::Render3D()
 	for (int i = 0; i <= 15; ++i)
 	{
 		if (RBall(i)->status != POCKET)
-			RBall(i)->model.Render();
+			RBall(i)->Render();
 	}
 	RModel(MODEL_TABLE)->Render();
 	RModel(MODEL_STAGE)->Render();
@@ -141,7 +138,7 @@ void MainScene::Render3D()
 		}
 
 		// ƒLƒ…[‚Ì•`‰æ
-		glm::vec3 pos = RBall(0)->model.position;
+		glm::vec3 pos = RBall(0)->position;
 		glPushMatrix();
 		glTranslatef(pos.x, pos.y, pos.z);
 		glRotatef(RadToDeg(angle) + 90, 0.f, 1.f, 0.f);

@@ -21,8 +21,12 @@ public:
 	XModel model;
 	glm::vec3 velocity;
 
+	float size;
+	glm::vec3 position;
+	glm::mat4 rotation;
+
 	Ball() {}
-	void Initialize();
+	void Initialize(glm::vec3 pos);
 	void SetWall(glm::vec3 min, glm::vec3 max);
 	void AddVec(glm::vec3 addVel);
 	void Move();
@@ -33,4 +37,6 @@ public:
 	void ResetHit() { hitScale = 0.f; }
 	float GetHitScale() { return hitScale; }
 	bool isMove() { return (status == MOVE || status == FALL); }
+	bool Load(char *filename, float scale = 1.0f);
+	void Render();
 };

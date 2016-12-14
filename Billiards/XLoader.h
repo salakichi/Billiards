@@ -152,22 +152,15 @@ private:
 	void ChangeMaterialIndex(XMaterial ob, int index);
 	void DeleteMaterial(XMaterial ob);
 
-	bool rotationFlag;
-
 public:
 	XBoundingSphere sphere;
 	XBoundingBox box;
 
 	glm::vec3 position;
-	glm::mat4 rotation;
 
 	bool Load(char *filename, float scale = 1.0f);
 	void Release();
 	void RenderMesh(int index);
 	void Render();
-	void EnableRotate()
-	{
-		rotationFlag = true;
-	}
 	XModel();
 };

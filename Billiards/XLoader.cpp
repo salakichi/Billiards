@@ -291,10 +291,8 @@ XModel::XModel()
 	numMeshes = 0;
 	numMaterials = 0;
 	position = glm::vec3(0.f);
-	rotation = glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(1.0, 0.0, 0.0));
 	box.min = glm::vec3(0.f);
 	box.max = glm::vec3(0.f);
-	rotationFlag = false;
 	matArr = nullptr;
 	matList = nullptr;
 	vbo = nullptr;
@@ -1167,15 +1165,7 @@ void XModel::RenderMesh(int index)
 {
 	glPushMatrix();
 	
-	if (rotationFlag)
-	{
-		glm::mat4x4 transRotMat = glm::translate<float>(glm::mat4(1.0f), position) * rotation * glm::translate<float>(glm::mat4(1.0f), glm::vec3(0.f, -sphere.radius, 0.f));
-		glMultMatrixf(&transRotMat[0][0]);
-	}
-	else
-	{
-		glTranslatef(position.x, position.y, position.z);
-	}
+	glTranslatef(position.x, position.y, position.z);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
